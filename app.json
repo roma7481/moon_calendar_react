@@ -2,7 +2,7 @@
   "expo": {
     "name": "Moon Calendar",
     "slug": "moon-calendar",
-    "version": "0.1.0",
+    "version": "8.5",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
     "icon": "./assets/app-icon.png",
@@ -23,7 +23,8 @@
         "com.google.android.gms.permission.AD_ID"
       ],
       "package": "com.crbee.mooncalendar",
-      "googleServicesFile": "./google-services.json"
+      "googleServicesFile": "./google-services.json",
+      "versionCode": 85
     },
     "splash": {
       "backgroundColor": "#1A0B2E"
