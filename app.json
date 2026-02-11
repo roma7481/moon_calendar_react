@@ -1,0 +1,54 @@
+{
+  "expo": {
+    "name": "Moon Calendar",
+    "slug": "moon-calendar",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "icon": "./assets/app-icon.png",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.crbee.mooncalendar"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/app-icon-foreground.png",
+        "backgroundColor": "#3E001F"
+      },
+      "permissions": [
+        "com.android.vending.BILLING",
+        "com.google.android.gms.permission.AD_ID"
+      ],
+      "package": "com.crbee.mooncalendar",
+      "googleServicesFile": "./google-services.json"
+    },
+    "splash": {
+      "backgroundColor": "#1A0B2E"
+    },
+    "notification": {
+      "icon": "./assets/notification-icon.png",
+      "color": "#FF9DD1"
+    },
+    "plugins": [
+      "./plugins/withLegacyPrefs",
+      "@react-native-firebase/app",
+      "@react-native-firebase/crashlytics",
+      [
+        "./plugins/withAppLovin",
+        {
+          "androidSdkKey": "qnL2sJHf5VT2RFA26vgN2heXM-Lpfdo4FPKD_09zl9TnHlPVSmGcSRPIQKwcsZwKIWCJZ62BtOONX_7JNmPDX_"
+        }
+      ],
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-1763151471947181~1996904078",
+          "iosAppId": "ca-app-pub-1763151471947181~1996904078"
+        }
+      ]
+    ]
+  }
+}

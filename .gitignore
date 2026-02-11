@@ -1,0 +1,13 @@
+node_modules/
+.expo/
+android/
+ios/
+bin/
+build/
+.gradle/
+.gradle-tmp/
+*.log
+.DS_Store
+package-lock.json
+google-services.json
+GoogleService-Info.plist

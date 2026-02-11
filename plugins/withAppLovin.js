@@ -1,0 +1,31 @@
+const { withAndroidManifest } = require('@expo/config-plugins');
+
+const withAppLovinAndroid = (config, sdkKey) => {
+  return withAndroidManifest(config, (config) => {
+    const androidManifest = config.modResults;
+    const mainApplication = androidManifest.manifest.application?.[0];
+    if (!mainApplication) return config;
+
+    let metaData = mainApplication['meta-data'] || [];
+    const hasKey = metaData.some((item) => item?.$?.['android:name'] === 'applovin.sdk.key');
+
+    if (!hasKey && sdkKey) {
+      metaData.push({
+        $: {
+          'android:name': 'applovin.sdk.key',
+          'android:value': sdkKey,
+        },
+      });
+      mainApplication['meta-data'] = metaData;
+    }
+
+    return config;
+  });
+};
+
+const withAppLovin = (config, props = {}) => {
+  const androidSdkKey = props.androidSdkKey;
+  return withAppLovinAndroid(config, androidSdkKey);
+};
+
+module.exports = withAppLovin;

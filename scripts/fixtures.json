@@ -1,0 +1,93 @@
+{
+  "generatedAt": "2026-02-09T03:19:03.195Z",
+  "cases": [
+    {
+      "id": "nyc-2026-02-08",
+      "date": "2026-02-08",
+      "timezone": "America/New_York",
+      "latitude": 40.714,
+      "longitude": -74.006,
+      "expected": {
+        "moonDays": [
+          {
+            "number": 21,
+            "start": 1770526139883,
+            "end": 1770616309379
+          }
+        ],
+        "zodiac": "scorpio"
+      }
+    },
+    {
+      "id": "moscow-2026-02-08",
+      "date": "2026-02-08",
+      "timezone": "Europe/Moscow",
+      "latitude": 55.7558,
+      "longitude": 37.6173,
+      "expected": {
+        "moonDays": [
+          {
+            "number": 20,
+            "start": 1770409484348,
+            "end": 1770500679907
+          },
+          {
+            "number": 21,
+            "start": 1770500679907,
+            "end": 1770591855936
+          }
+        ],
+        "zodiac": "scorpio"
+      }
+    },
+    {
+      "id": "sydney-2026-06-15",
+      "date": "2026-06-15",
+      "timezone": "Australia/Sydney",
+      "latitude": -33.8688,
+      "longitude": 151.2093,
+      "expected": {
+        "moonDays": [
+          {
+            "number": 1,
+            "start": 1781492160326,
+            "end": 1781561241544
+          },
+          {
+            "number": 29,
+            "start": 1781380414151,
+            "end": 1781471009131
+          },
+          {
+            "number": 30,
+            "start": 1781471009131,
+            "end": 1781492160326
+          }
+        ],
+        "zodiac": "cancer"
+      }
+    },
+    {
+      "id": "tokyo-2026-12-01",
+      "date": "2026-12-01",
+      "timezone": "Asia/Tokyo",
+      "latitude": 35.6762,
+      "longitude": 139.6503,
+      "expected": {
+        "moonDays": [
+          {
+            "number": 22,
+            "start": 1796045241454,
+            "end": 1796135787420
+          },
+          {
+            "number": 23,
+            "start": 1796135787420,
+            "end": 1796226183300
+          }
+        ],
+        "zodiac": "virgo"
+      }
+    }
+  ]
+}
