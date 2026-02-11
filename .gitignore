@@ -11,3 +11,5 @@ build/
 package-lock.json
 google-services.json
 GoogleService-Info.plist
+*.apk
+*.aab
