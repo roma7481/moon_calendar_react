@@ -24,7 +24,7 @@
       ],
       "package": "com.crbee.mooncalendar",
       "googleServicesFile": "./google-services.json",
-      "versionCode": 85
+      "versionCode": 86
     },
     "splash": {
       "backgroundColor": "#1A0B2E"
@@ -50,6 +50,11 @@
           "iosAppId": "ca-app-pub-1763151471947181~1996904078"
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "1a86d8f3-ce9d-4d8d-b2b7-921a2db41dbe"
+      }
+    }
   }
 }

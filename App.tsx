@@ -33,6 +33,9 @@ import {
   SpaceGrotesk_700Bold,
   useFonts,
 } from '@expo-google-fonts/space-grotesk';
+import {
+  CormorantGaramond_600SemiBold,
+} from '@expo-google-fonts/cormorant-garamond';
 
 import { calcMoonDays, calcMoonMonth, LunarDay } from './src/domain/moon/lunar';
 import { calcMoonInfo } from './src/domain/moon/moonInfo';
@@ -93,6 +96,7 @@ type CategoryItem = {
   icon: keyof typeof MaterialIcons.glyphMap;
   accent: string;
   linkText?: string;
+  linkUrl?: string;
 };
 
 type Strings = ReturnType<typeof getStrings>;
@@ -111,44 +115,50 @@ const PREMIUM_PRODUCT_ID = 'moon_premium';
 
 const getStrings = (locale: AppLocale) => {
   const isRu = locale === 'ru';
+  const isJa = locale === 'ja';
+  const t = (en: string, ru: string, ja: string = en) => (isRu ? ru : isJa ? ja : en);
 
   return {
-    appTitle: isRu ? 'Лунный календарь' : 'Moon Calendar',
-    appSubtitle: isRu ? 'Лунный календарь' : 'Moon Calendar App',
-    dailyInfluences: isRu ? 'Ежедневные влияния' : 'Daily Influences',
-    profileTitle: isRu ? 'Профиль' : 'Profile',
-    language: isRu ? 'Язык' : 'Language',
+    appTitle: t('Moon Calendar', 'Лунный календарь', '月のカレンダー'),
+    appSubtitle: t('Moon Calendar App', 'Лунный календарь', '月のカレンダーアプリ'),
+    dailyInfluences: t('Daily Influences', 'Ежедневные влияния', '日々の影響'),
+    profileTitle: t('Profile', 'Профиль', 'プロフィール'),
+    language: t('Language', 'Язык', '言語'),
     english: 'English',
     russian: 'Русский',
-    notifications: isRu ? 'Уведомления' : 'Notifications',
-    dailyReminder: isRu ? 'Ежедневное напоминание' : 'Daily reminder',
-    reminderTime: isRu ? 'Время напоминания' : 'Reminder time',
-    reminderTitle: isRu ? 'Лунный календарь' : 'Moon Calendar',
-    reminderBody: isRu ? 'Ваш лунный прогноз готов.' : 'Your lunar update is ready.',
-    reminderError: isRu ? 'Не удалось включить напоминание.' : 'Unable to schedule reminder.',
-    textSize: isRu ? 'Размер текста' : 'Text size',
-    sizeSmall: isRu ? 'Маленький' : 'Small',
-    sizeMedium: isRu ? 'Средний' : 'Medium',
-    sizeLarge: isRu ? 'Большой' : 'Large',
-    theme: isRu ? 'Тема' : 'Theme',
-    themeBlueDay: isRu ? 'Голубой день' : 'Blue Day',
-    themeDeepBlueNight: isRu ? 'Глубокая синяя ночь' : 'Deep Blue Night',
-    themeRaspberry: isRu ? 'Малина' : 'Raspberry',
-    themeDreamland: isRu ? 'Дримленд' : 'Dreamland',
-    themeAmethyst: isRu ? 'Аметист' : 'Amethyst',
-    moreApps: isRu ? 'Другие приложения' : 'More Apps',
-    rateAppTitle: isRu ? 'Лунный календарь' : 'Moon calendar',
-    rateEnjoyTitle: isRu ? 'Лунный календарь' : 'Moon calendar',
-    rateEnjoyBody: isRu ? 'Вам нравится это приложение?' : 'Do you enjoy the app?',
-    rateYes: isRu ? 'Да' : 'Yes',
-    rateNo: isRu ? 'Нет' : 'No',
-    rateTitle: isRu ? 'Оцените приложение' : 'Rate us',
-    rateBody: isRu
-      ? 'Если вам понравилось это приложение, пожалуйста, найдите время, чтобы оценить его. Это не займет больше минуты. Спасибо за вашу поддержку!'
-      : 'If you like this app, please take a moment to rate it. It will not take more than a minute. Thanks for your support!',
-    rateNow: isRu ? 'Ок' : 'Rate now',
-    rateLater: isRu ? 'Напомнить позже' : 'Remind me later',
-    rateNoThanks: isRu ? 'Нет, спасибо' : 'No thanks',
+    japanese: '日本語',
+    notifications: t('Notifications', 'Уведомления', '通知'),
+    dailyReminder: t('Daily reminder', 'Ежедневное напоминание', '毎日のリマインダー'),
+    reminderTime: t('Reminder time', 'Время напоминания', 'リマインダー時刻'),
+    reminderTitle: t('Moon Calendar', 'Лунный календарь', '月のカレンダー'),
+    reminderBody: t('Your lunar update is ready.', 'Ваш лунный прогноз готов.', '今日の月の予報ができました。'),
+    reminderError: t('Unable to schedule reminder.', 'Не удалось включить напоминание.', 'リマインダーを設定できませんでした。'),
+    textSize: t('Text size', 'Размер текста', '文字サイズ'),
+    sizeSmall: t('Small', 'Маленький', '小'),
+    sizeMedium: t('Medium', 'Средний', '中'),
+    sizeLarge: t('Large', 'Большой', '大'),
+    theme: t('Theme', 'Тема', 'テーマ'),
+    next: t('Next', 'Далее', '次へ'),
+    themeBlueDay: t('Blue Day', 'Голубой день', 'ブルーデイ'),
+    themeDeepBlueNight: t('Deep Blue Night', 'Глубокая синяя ночь', 'ディープブルーナイト'),
+    themeRaspberry: t('Raspberry', 'Малина', 'ラズベリー'),
+    themeDreamland: t('Dreamland', 'Дримленд', 'ドリームランド'),
+    themeAmethyst: t('Amethyst', 'Аметист', 'アメジスト'),
+    moreApps: t('More Apps', 'Другие приложения', '他のアプリ'),
+    rateAppTitle: t('Moon calendar', 'Лунный календарь', '月のカレンダー'),
+    rateEnjoyTitle: t('Moon calendar', 'Лунный календарь', '月のカレンダー'),
+    rateEnjoyBody: t('Do you enjoy the app?', 'Вам нравится это приложение?', 'このアプリを楽しんでいますか？'),
+    rateYes: t('Yes', 'Да', 'はい'),
+    rateNo: t('No', 'Нет', 'いいえ'),
+    rateTitle: t('Rate us', 'Оцените приложение', '評価をお願いします'),
+    rateBody: t(
+      'If you like this app, please take a moment to rate it. It will not take more than a minute. Thanks for your support!',
+      'Если вам понравилось это приложение, пожалуйста, найдите время, чтобы оценить его. Это не займет больше минуты. Спасибо за вашу поддержку!',
+      'このアプリを気に入っていただけたら、評価にご協力ください。1分もかかりません。ありがとうございます！'
+    ),
+    rateNow: t('Rate now', 'Ок', '今すぐ評価'),
+    rateLater: t('Remind me later', 'Напомнить позже', '後で通知'),
+    rateNoThanks: t('No thanks', 'Нет, спасибо', 'いいえ、結構です'),
     healingPhrases: {
       universal: isRu
         ? [
@@ -156,75 +166,103 @@ const getStrings = (locale: AppLocale) => {
           'Звук может деликатно поддержать эту фазу.',
           'Простой звуковой ритуал может быть поддерживающим.',
         ]
-        : [
-          'Support this lunar energy with sound.',
-          'Sound can gently support this phase.',
-          'A simple sound ritual may feel supportive.',
-        ],
+        : isJa
+          ? [
+            'この月のエネルギーは音でサポートできます。',
+            '音はこのフェーズをやさしく支えます。',
+            'シンプルな音の習慣が支えになるかもしれません。',
+          ]
+          : [
+            'Support this lunar energy with sound.',
+            'Sound can gently support this phase.',
+            'A simple sound ritual may feel supportive.',
+          ],
       newMoon: isRu
         ? [
           'Заземляющий звуковой ритуал может поддержать новые начала.',
           'Тихие звуки могут сопровождать постановку намерений.',
         ]
-        : [
-          'A grounding sound ritual may support new beginnings.',
-          'Quiet tones can accompany intention-setting.',
-        ],
+        : isJa
+          ? [
+            '新しい始まりには、落ち着いた音の儀式が合うかもしれません。',
+            '静かな音は意図設定に寄り添います。',
+          ]
+          : [
+            'A grounding sound ritual may support new beginnings.',
+            'Quiet tones can accompany intention-setting.',
+          ],
       waxing: isRu
         ? ['Звук может поддержать фокус и рост.', 'Звуки для ясности могут быть полезны.']
-        : ['Support focus and growth with sound.', 'Clarity-focused sounds may feel helpful.'],
+        : isJa
+          ? ['集中と成長を音でサポート。', '明晰さを高める音が役立つかもしれません。']
+          : ['Support focus and growth with sound.', 'Clarity-focused sounds may feel helpful.'],
       firstQuarter: isRu
         ? ['Заземляющие звуки могут помочь при сопротивлении.', 'Звук может поддержать спокойное действие.']
-        : ['Grounding sounds may help with resistance.', 'Sound can support steady action.'],
+        : isJa
+          ? ['抵抗を感じる時は、安定する音が助けになります。', '音は着実な行動を支えます。']
+          : ['Grounding sounds may help with resistance.', 'Sound can support steady action.'],
       fullMoon: isRu
         ? ['Успокаивающие звуки могут поддержать эмоциональное освобождение.', 'Звук может помочь снизить интенсивность.']
-        : ['Calming sounds may support emotional release.', 'Sound can help settle intensity.'],
+        : isJa
+          ? ['心を落ち着かせる音が感情の解放を助けます。', '音は高ぶりを鎮めるのに役立ちます。']
+          : ['Calming sounds may support emotional release.', 'Sound can help settle intensity.'],
       waning: isRu
         ? ['Мягкие звуки поддерживают отдых и интеграцию.', 'Звук может помочь замедлиться.']
-        : ['Soft tones support rest and integration.', 'Sound can help you slow down.'],
+        : isJa
+          ? ['穏やかな音は休息と統合を支えます。', '音はペースを落とす助けになります。']
+          : ['Soft tones support rest and integration.', 'Sound can help you slow down.'],
       darkMoon: isRu
         ? ['Очень мягкий звук или тишина могут быть наиболее комфортными.', 'В этой фазе слушать необязательно.']
-        : ['Very gentle sound or silence may feel safest.', 'Listening is optional during this phase.'],
+        : isJa
+          ? ['とても静かな音、または沈黙が最も心地よいかもしれません。', 'このフェーズでは聴くことは必須ではありません。']
+          : ['Very gentle sound or silence may feel safest.', 'Listening is optional during this phase.'],
     },
-    notesTitle: isRu ? 'Заметки' : 'Notes',
-    notesSubtitle: isRu ? 'Лунный дневник' : 'Moon Journal',
-    notePlaceholder: isRu ? 'Добавьте заметку...' : 'Write your note...',
-    noteSave: isRu ? 'Сохранить' : 'Save',
-    noteDelete: isRu ? 'Удалить' : 'Delete',
-    notesEmpty: isRu ? 'Заметок пока нет.' : 'No notes yet.',
-    notesListTitle: isRu ? 'Все заметки' : 'All notes',
-    noteForDay: (day: number) => (isRu ? `Заметка для лунного дня ${day}` : `Note for lunar day ${day}`),
-    noteEdit: isRu ? 'Редактировать' : 'Edit',
-    customCityTitle: isRu ? 'Свои координаты' : 'Custom City',
-    cityNameLabel: isRu ? 'Название' : 'Name',
-    latitudeLabel: isRu ? 'Широта' : 'Latitude',
-    longitudeLabel: isRu ? 'Долгота' : 'Longitude',
-    saveCustomCity: isRu ? 'Сохранить' : 'Save',
-    invalidCustomCity: isRu ? 'Проверьте название и координаты.' : 'Please check the name and coordinates.',
-    citySaved: isRu ? 'Город сохранён' : 'City Saved',
-    edit: isRu ? 'Редактировать' : 'Edit',
-    delete: isRu ? 'Удалить' : 'Delete',
-    noCustomCities: isRu ? 'Своих городов пока нет.' : 'No custom cities yet.',
-    privacyPolicy: isRu ? 'Политика конфиденциальности' : 'Privacy Policy',
-    deleteCityTitle: isRu ? 'Удалить город?' : 'Delete city?',
-    deleteCityMessage: isRu ? 'Вы уверены, что хотите удалить этот город?' : 'Are you sure you want to delete this city?',
-    cancel: isRu ? 'Отмена' : 'Cancel',
-    exportNotes: isRu ? 'Экспорт заметок' : 'Export notes',
-    importNotes: isRu ? 'Импорт заметок' : 'Import notes',
-    importSuccess: (count: number) => (isRu ? `Импортировано ${count} записей` : `Imported ${count} notes`),
-    importFailed: isRu ? 'Не удалось импортировать файл' : 'Import failed',
-    premium: isRu ? 'Премиум' : 'Premium',
-    premiumTitle: isRu ? 'Премиум доступ' : 'Premium Access',
-    premiumSubtitle: isRu ? 'Разблокируйте все функции за один платеж' : 'Unlock all features with a one-time purchase',
-    premiumCta: isRu ? 'Разблокировать' : 'Unlock Premium',
-    premiumRestore: isRu ? 'Восстановить покупку' : 'Restore Purchase',
-    premiumNotNow: isRu ? 'Не сейчас' : 'Not now',
-    premiumLocked: isRu ? 'Требуется премиум' : 'Premium required',
-    premiumActive: isRu ? 'Активен' : 'Active',
-    premiumUnlocked: isRu ? 'Премиум активирован.' : 'Premium activated.',
-    purchaseFailed: isRu ? 'Покупка не удалась.' : 'Purchase failed.',
-    restoreSuccess: isRu ? 'Покупка восстановлена.' : 'Purchase restored.',
-    restoreNone: isRu ? 'Покупки не найдены.' : 'No purchases found.',
+    notesTitle: t('Notes', 'Заметки', 'メモ'),
+    notesSubtitle: t('Moon Journal', 'Лунный дневник', '月のジャーナル'),
+    notePlaceholder: t('Write your note...', 'Добавьте заметку...', 'メモを追加...'),
+    noteSave: t('Save', 'Сохранить', '保存'),
+    noteDelete: t('Delete', 'Удалить', '削除'),
+    notesEmpty: t('No notes yet.', 'Заметок пока нет.', 'まだメモはありません。'),
+    notesListTitle: t('All notes', 'Все заметки', 'すべてのメモ'),
+    noteForDay: (day: number) => (isRu ? `Заметка для лунного дня ${day}` : isJa ? `月の日${day}のメモ` : `Note for lunar day ${day}`),
+    noteEdit: t('Edit', 'Редактировать', '編集'),
+    customCityTitle: t('Custom City', 'Свои координаты', 'カスタム都市'),
+    cityNameLabel: t('Name', 'Название', '名称'),
+    latitudeLabel: t('Latitude', 'Широта', '緯度'),
+    longitudeLabel: t('Longitude', 'Долгота', '経度'),
+    saveCustomCity: t('Save', 'Сохранить', '保存'),
+    invalidCustomCity: t('Please check the name and coordinates.', 'Проверьте название и координаты.', '名称と座標を確認してください。'),
+    citySaved: t('City Saved', 'Город сохранён', '都市を保存しました'),
+    onboardingCityHint: t(
+      "Can't find your city? Pick the nearest one — you can change it anytime in Profile.",
+      'Не нашли свой город? Выберите ближайший — его можно изменить в настройках.',
+      '都市が見つかりませんか？最寄りを選んでください — プロフィールでいつでも変更できます。'
+    ),
+    onboardingCityCustom: t('Enter custom coordinates', 'Ввести свои координаты', 'カスタム座標を入力'),
+    onboardingPreviousCity: t('Previously selected', 'Ранее выбранный', '以前に選択'),
+    edit: t('Edit', 'Редактировать', '編集'),
+    delete: t('Delete', 'Удалить', '削除'),
+    noCustomCities: t('No custom cities yet.', 'Своих городов пока нет.', 'カスタム都市はまだありません。'),
+    privacyPolicy: t('Privacy Policy', 'Политика конфиденциальности', 'プライバシーポリシー'),
+    deleteCityTitle: t('Delete city?', 'Удалить город?', '都市を削除しますか？'),
+    deleteCityMessage: t('Are you sure you want to delete this city?', 'Вы уверены, что хотите удалить этот город?', 'この都市を削除してよろしいですか？'),
+    cancel: t('Cancel', 'Отмена', 'キャンセル'),
+    exportNotes: t('Export notes', 'Экспорт заметок', 'メモをエクスポート'),
+    importNotes: t('Import notes', 'Импорт заметок', 'メモをインポート'),
+    importSuccess: (count: number) => (isRu ? `Импортировано ${count} записей` : isJa ? `${count}件をインポートしました` : `Imported ${count} notes`),
+    importFailed: t('Import failed', 'Не удалось импортировать файл', 'インポートに失敗しました'),
+    premium: t('Premium', 'Премиум', 'プレミアム'),
+    premiumTitle: t('Premium Access', 'Премиум доступ', 'プレミアムアクセス'),
+    premiumSubtitle: t('Unlock all features with a one-time purchase', 'Разблокируйте все функции за один платеж', '一度の支払いで全機能を解除'),
+    premiumCta: t('Unlock Premium', 'Разблокировать', 'プレミアムを解除'),
+    premiumRestore: t('Restore Purchase', 'Восстановить покупку', '購入を復元'),
+    premiumNotNow: t('Not now', 'Не сейчас', '後で'),
+    premiumLocked: t('Premium required', 'Требуется премиум', 'プレミアムが必要です'),
+    premiumActive: t('Active', 'Активен', '有効'),
+    premiumUnlocked: t('Premium activated.', 'Премиум активирован.', 'プレミアムが有効になりました。'),
+    purchaseFailed: t('Purchase failed.', 'Покупка не удалась.', '購入に失敗しました。'),
+    restoreSuccess: t('Purchase restored.', 'Покупка восстановлена.', '購入を復元しました。'),
+    restoreNone: t('No purchases found.', 'Покупки не найдены.', '購入が見つかりません。'),
     premiumBenefits: isRu
       ? [
         'Доступ к заметкам и лунному дневнику',
@@ -232,56 +270,71 @@ const getStrings = (locale: AppLocale) => {
         'Просмотр будущих дат в календаре',
         'Без рекламы',
       ]
-      : [
-        'Moon calendar journal and notes',
-        'Unlock all daily categories',
-        'View future calendar dates',
-        'Remove ads',
-      ],
-    restorePurchase: isRu ? 'Восстановить покупки' : 'Restore Purchase',
-    support: isRu ? 'Поддержка' : 'Support',
-    feedback: isRu ? 'Обратная связь' : 'Send Feedback',
-    about: isRu ? 'О приложении' : 'About',
-    version: isRu ? 'Версия' : 'Version',
-    comingSoon: isRu ? 'Скоро' : 'Coming soon',
-    city: isRu ? 'Город' : 'City',
-    moonSign: isRu ? 'Лунный знак' : 'Moon Sign',
-    lunarDay: isRu ? 'Лунный день' : 'Lunar Day',
-    starts: isRu ? 'Начало' : 'Starts',
-    ends: isRu ? 'Конец' : 'Ends',
-    chooseCity: isRu ? 'Выбор города' : 'Choose City',
-    searchCities: isRu ? 'Поиск города' : 'Search cities',
-    noCities: isRu ? 'Города не найдены.' : 'No cities match your search.',
-    illumination: isRu ? 'освещенности' : 'Illumination',
-    daysToFullMoon: (days: number) => (isRu ? `До полнолуния ${days} дн.` : `${days} Days to Full Moon`),
-    fullMoon: isRu ? 'Полнолуние' : 'Full Moon',
-    weekdays: isRu ? ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'] : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+      : isJa
+        ? [
+          '月のジャーナルとメモ',
+          'すべてのカテゴリを解放',
+          '未来の日付を表示',
+          '広告を削除',
+        ]
+        : [
+          'Moon calendar journal and notes',
+          'Unlock all daily categories',
+          'View future calendar dates',
+          'Remove ads',
+        ],
+    restorePurchase: t('Restore Purchase', 'Восстановить покупки', '購入を復元'),
+    support: t('Support', 'Поддержка', 'サポート'),
+    feedback: t('Send Feedback', 'Обратная связь', 'フィードバックを送信'),
+    about: t('About', 'О приложении', 'アプリについて'),
+    version: t('Version', 'Версия', 'バージョン'),
+    comingSoon: t('Coming soon', 'Скоро', '近日公開'),
+    city: t('City', 'Город', '都市'),
+    moonSign: t('Moon Sign', 'Лунный знак', '月の星座'),
+    lunarDay: t('Lunar Day', 'Лунный день', '月の日'),
+    starts: t('Starts', 'Начало', '開始'),
+    ends: t('Ends', 'Конец', '終了'),
+    chooseCity: t('Choose City', 'Выбор города', '都市を選択'),
+    searchCities: t('Search cities', 'Поиск города', '都市を検索'),
+    noCities: t('No cities match your search.', 'Города не найдены.', '該当する都市がありません。'),
+    illumination: t('Illumination', 'освещенности', '照度'),
+    daysToFullMoon: (days: number) => (isRu ? `До полнолуния ${days} дн.` : isJa ? `満月まで${days}日` : `${days} Days to Full Moon`),
+    fullMoon: t('Full Moon', 'Полнолуние', '満月'),
+    weekdays: isRu ? ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'] : isJa ? ['日', '月', '火', '水', '木', '金', '土'] : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
     weekStartsOnMonday: isRu,
-    noCategoryData: isRu ? 'Нет данных для выбранного лунного дня.' : 'No category data for this lunar day.',
+    noCategoryData: t('No category data for this lunar day.', 'Нет данных для выбранного лунного дня.', '選択した月の日のデータがありません。'),
     influenceTitles: {
-      dayCharacteristics: isRu ? 'Характеристика дня' : 'Day Characteristics',
-      personality: isRu ? 'Влияние на личность' : 'Personality',
-      business: isRu ? 'Бизнес и карьера' : 'Business & Career',
-      health: isRu ? 'Здоровье' : 'Health & Wellness',
-      haircut: isRu ? 'Стрижка и рост' : 'Haircut & Growth',
-      relations: isRu ? 'Отношения' : 'Relationships',
-      marriage: isRu ? 'Брак' : 'Marriage',
-      birthday: isRu ? 'День рождения' : 'Birthday',
-      recommendations: isRu ? 'Рекомендации' : 'Recommendations',
-      warnings: isRu ? 'Предупреждения' : 'Warnings',
-      dreams: isRu ? 'Сны' : 'Dreams',
-      manicure: isRu ? 'Маникюр' : 'Manicure',
-      diet: isRu ? 'Диета' : 'Diet',
-      shopping: isRu ? 'Шоппинг' : 'Shopping',
-      garden: isRu ? 'Садоводство' : 'Gardening',
+      dayCharacteristics: t('Day Characteristics', 'Характеристика дня', '日の特徴'),
+      personality: t('Personality', 'Влияние на личность', '性格への影響'),
+      business: t('Business & Career', 'Бизнес и карьера', 'ビジネスとキャリア'),
+      health: t('Health & Wellness', 'Здоровье', '健康'),
+      haircut: t('Haircut & Growth', 'Стрижка и рост', 'ヘアカットと成長'),
+      relations: t('Relationships', 'Отношения', '人間関係'),
+      marriage: t('Marriage', 'Брак', '結婚'),
+      birthday: t('Birthday', 'День рождения', '誕生日'),
+      recommendations: t('Recommendations', 'Рекомендации', 'おすすめ'),
+      warnings: t('Warnings', 'Предупреждения', '注意'),
+      dreams: t('Dreams', 'Сны', '夢'),
+      manicure: t('Manicure', 'Маникюр', 'マニキュア'),
+      diet: t('Diet', 'Диета', '食事'),
+      shopping: t('Shopping', 'Шоппинг', 'ショッピング'),
+      garden: t('Gardening', 'Садоводство', 'ガーデニング'),
+    },
+    promoLinks: {
+      dreams: t('Look up for detailed dream meaning in Dreambook.', 'Узнайте подробное значение сна в Сонник.', '詳しい夢の意味をドリームブックで調べましょう。'),
+      dreamsLink: t('Dreambook', 'Сонник', 'ドリームブック'),
+      recommendations: t('Look up advice with Tarot Spreads.', 'Получите совет с помощью Расклад Таро.', 'タロースプレッドでアドバイスを調べましょう。'),
+      recommendationsLink: t('Tarot Spreads', 'Расклад Таро', 'タロースプレッド'),
+      business: t('Look up daily biorhythms with Numerology.', 'Узнайте суточные биоритмы с Нумерология.', '毎日のバイオリズムを数秘術で調べましょう。'),
+      businessLink: t('Numerology', 'Нумерология', '数秘術'),
     },
     phaseLabels: {
-      'New Moon': isRu ? 'Новолуние' : 'New Moon',
-      'Waxing Crescent': isRu ? 'Растущий серп' : 'Waxing Crescent',
-      'Waxing Gibbous': isRu ? 'Растущая луна' : 'Waxing Gibbous',
-      'Full Moon': isRu ? 'Полнолуние' : 'Full Moon',
-      'Waning Gibbous': isRu ? 'Убывающая луна' : 'Waning Gibbous',
-      'Waning Crescent': isRu ? 'Убывающий серп' : 'Waning Crescent',
+      'New Moon': t('New Moon', 'Новолуние', '新月'),
+      'Waxing Crescent': t('Waxing Crescent', 'Растущий серп', '満ちていく三日月'),
+      'Waxing Gibbous': t('Waxing Gibbous', 'Растущая луна', '満ちていく月'),
+      'Full Moon': t('Full Moon', 'Полнолуние', '満月'),
+      'Waning Gibbous': t('Waning Gibbous', 'Убывающая луна', '欠けていく月'),
+      'Waning Crescent': t('Waning Crescent', 'Убывающий серп', '欠けていく三日月'),
     },
   };
 };
@@ -336,9 +389,22 @@ const buildCategories = (
     makeCategory('garden', strings.influenceTitles.garden, info.garden, 'eco', '#7CE6B6'),
   ];
 
+  const promoMap: Record<string, { linkText: string; linkUrl: string }> = {
+    dreams: { linkText: strings.promoLinks.dreams, linkUrl: 'https://play.google.com/store/apps/details?id=crazybee.com.dreambookrus' },
+    recommendations: { linkText: strings.promoLinks.recommendations, linkUrl: 'https://play.google.com/store/apps/details?id=gadanie.dailymistika.ru.gadanie' },
+    business: { linkText: strings.promoLinks.business, linkUrl: 'https://play.google.com/store/apps/details?id=numerology.dailymistika.ru' },
+  };
+
   return ordered
     .filter((item): item is CategoryItem => item !== null)
-    .map((item) => ({ ...item, linkText: links?.[item.key] }));
+    .map((item) => {
+      const promo = promoMap[item.key];
+      return {
+        ...item,
+        linkText: promo?.linkText ?? links?.[item.key],
+        linkUrl: promo?.linkUrl,
+      };
+    });
 };
 
 const pickHealingPhrase = (phaseName: string, strings: Strings, seed: number) => {
@@ -388,9 +454,7 @@ const resolveMoonData = async (
   const dayInfo = await getMoonDayInfo(moonDay.number, locale, zodiac);
   const links: Record<string, string | undefined> = {};
   const seedDate = new Date(moonDay.start);
-  if (shouldShowHealingLink(seedDate, moonDay.number, 'day-characteristics')) {
-    links['day-characteristics'] = pickHealingPhrase(moonInfo.phaseName, strings, moonDay.number);
-  }
+  links['day-characteristics'] = pickHealingPhrase(moonInfo.phaseName, strings, moonDay.number);
   if (shouldShowHealingLink(seedDate, moonDay.number, 'health')) {
     links['health'] = pickHealingPhrase(moonInfo.phaseName, strings, moonDay.number + 7);
   }
@@ -414,6 +478,7 @@ function AppContent() {
     SpaceGrotesk_400Regular,
     SpaceGrotesk_500Medium,
     SpaceGrotesk_700Bold,
+    CormorantGaramond_600SemiBold,
   });
   const [selectedDate, setSelectedDate] = useState(() => new Date());
   const [city, setCity] = useState<City | null>(null);
@@ -441,11 +506,14 @@ function AppContent() {
   const [calendarLoading, setCalendarLoading] = useState(false);
   const [isPremium, setIsPremium] = useState(false);
   const [paywallVisible, setPaywallVisible] = useState(false);
+  const [onboardingStep, setOnboardingStep] = useState<'language' | 'theme' | 'city' | null>(null);
   const [iapReady, setIapReady] = useState(false);
   const [iapBusy, setIapBusy] = useState(false);
+  const [productPrice, setProductPrice] = useState<string | null>(null);
   const purchaseListenerRef = useRef<ReturnType<typeof RNIap.purchaseUpdatedListener> | null>(null);
   const purchaseErrorRef = useRef<ReturnType<typeof RNIap.purchaseErrorListener> | null>(null);
-  const [themeName, setThemeName] = useState<ThemeName>('blue-day');
+  const [themeName, setThemeName] = useState<ThemeName>('raspberry');
+  const [previewTheme, setPreviewTheme] = useState<ThemeName>('raspberry');
   const interstitialRef = useRef<ReturnType<typeof createInterstitial> | null>(null);
   const tabSwitchCount = useRef(0);
   const [noteTargetDayId, setNoteTargetDayId] = useState<number | null>(null);
@@ -481,11 +549,12 @@ function AppContent() {
     []
   );
   const deviceLocale = useMemo(() => {
+    if (locale === 'ru') return 'ru-RU';
+    if (locale === 'ja') return 'ja-JP';
     const detected = Localization.locale || Intl.DateTimeFormat().resolvedOptions().locale;
-    if (detected) return detected;
-    return locale === 'ru' ? 'ru-RU' : 'en-US';
+    return detected || 'en-US';
   }, [locale]);
-  const theme = useMemo(() => themes[themeName], [themeName]);
+  const theme = useMemo(() => themes[themeName] as (typeof themes)[ThemeName], [themeName]);
   const showAds = !isPremium;
 
   const textScale = useMemo(() => {
@@ -578,6 +647,7 @@ function AppContent() {
       ]);
       if (!active) return;
       if (storedLanguage) setLocale(storedLanguage);
+      else setOnboardingStep('language');
       setNotificationsEnabled(storedNotifications.enabled);
       setNotificationMinutes(storedNotifications.minutes);
       if (storedTextSize) setTextSize(storedTextSize);
@@ -617,16 +687,18 @@ function AppContent() {
           showRateDialogs();
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }, [loading, fontsLoaded, locale]);
 
   useEffect(() => {
     let active = true;
     initAds()
-      .then(() => {
+      .then((provider) => {
         if (active) setAdsReady(true);
       })
-      .catch(() => { });
+      .catch((error) => {
+        if (active) setAdsReady(true);
+      });
     return () => {
       active = false;
     };
@@ -920,7 +992,10 @@ function AppContent() {
           <>
             <Text style={styles.influenceText}>{item.description}</Text>
             {item.linkText ? (
-              <Pressable style={styles.influenceLinkWrap} onPress={openHealingSounds}>
+              <Pressable
+                style={styles.influenceLinkWrap}
+                onPress={item.linkUrl ? () => Linking.openURL(item.linkUrl!) : openHealingSounds}
+              >
                 <Text style={styles.influenceLinkText}>{item.linkText}</Text>
               </Pressable>
             ) : null}
@@ -1017,6 +1092,14 @@ function AppContent() {
   );
 
   const handleMonthShift = (delta: number) => {
+    if (delta > 0 && !isPremium) {
+      const now = new Date();
+      const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+      if (calendarMonth >= currentMonthStart) {
+        openPaywall();
+        return;
+      }
+    }
     setCalendarMonth((prev) => new Date(prev.getFullYear(), prev.getMonth() + delta, 1));
   };
 
@@ -1058,10 +1141,12 @@ function AppContent() {
     } catch (err) {
       setError('Unable to save city selection.');
     }
+    if (onboardingStep === 'city') setOnboardingStep(null);
   };
 
   const handleLanguageSelect = async (language: AppLocale) => {
     setLocale(language);
+    if (onboardingStep === 'language') setOnboardingStep('theme');
     try {
       await setStoredLanguage(language);
     } catch (err) {
@@ -1258,7 +1343,11 @@ function AppContent() {
       if (Platform.OS === 'android') {
         await RNIap.flushFailedPurchasesCachedAsPendingAndroid();
       }
-      await RNIap.getProducts({ skus: [PREMIUM_PRODUCT_ID] });
+      const products = await RNIap.getProducts({ skus: [PREMIUM_PRODUCT_ID] });
+      const product = products.find((p) => p.productId === PREMIUM_PRODUCT_ID);
+      if (product?.localizedPrice) {
+        setProductPrice(product.localizedPrice);
+      }
       setIapReady(true);
       const available = await RNIap.getAvailablePurchases();
       const hasPremium = available.some((purchase) => purchase.productId === PREMIUM_PRODUCT_ID);
@@ -1297,7 +1386,8 @@ function AppContent() {
       setCustomLatitude('');
       setCustomLongitude('');
       setEditingCustomCityId(null);
-      showSnackbar(strings.citySaved);
+      if (onboardingStep === 'city') setOnboardingStep(null);
+      else showSnackbar(strings.citySaved);
     } catch (err) {
       setError('Unable to save custom city.');
     }
@@ -1484,7 +1574,7 @@ function AppContent() {
                 </View>
 
                 <View style={styles.hero}>
-                  <View style={styles.moonHaloOne} />
+                  <View style={[styles.moonHaloOne, { backgroundColor: theme.moonHalo }]} />
                   <View style={styles.moonHaloTwo} />
                   <View style={[styles.moonSphere, shadows.glow]}>
                     <View style={styles.moonSurface} />
@@ -1559,8 +1649,8 @@ function AppContent() {
                                 selectedMoonDay && isSameMoonDay(selectedMoonDay, day) && styles.lunarDayRangeRowActive,
                               ]}
                             >
-                              <View style={styles.lunarDayRangeBadge}>
-                                <Text style={styles.lunarDayRangeNumber}>{day.number}</Text>
+                              <View style={[styles.lunarDayRangeBadge, selectedMoonDay && isSameMoonDay(selectedMoonDay, day) && styles.lunarDayRangeBadgeActive]}>
+                                <Text style={[styles.lunarDayRangeNumber, selectedMoonDay && isSameMoonDay(selectedMoonDay, day) && styles.lunarDayRangeNumberActive]}>{day.number}</Text>
                                 <Text style={styles.lunarDayRangeLabel}>{strings.lunarDay}</Text>
                               </View>
                               <View style={styles.lunarDayRangeColumn}>
@@ -1588,45 +1678,58 @@ function AppContent() {
                     ) : null}
                   </View>
 
-                  <View style={styles.notesCard}>
-                    <View style={styles.notesHeaderRow}>
-                      <Text style={styles.notesTitle}>{strings.notesTitle}</Text>
-                      <Pressable style={styles.notesLink} onPress={() => setActiveTab('notes')}>
-                        <Text style={styles.notesLinkText}>{strings.notesListTitle}</Text>
-                      </Pressable>
-                    </View>
-                    <Text style={styles.notesSubtitle}>
-                      {noteTargetDayId ? strings.noteForDay(noteTargetDayId) : strings.notesSubtitle}
-                    </Text>
-                    <TextInput
-                      style={styles.notesInput}
-                      placeholder={strings.notePlaceholder}
-                      placeholderTextColor={colors.whiteMuted}
-                      value={noteDraft}
-                      onChangeText={setNoteDraft}
-                      multiline
-                      editable={!!noteTargetDayId}
-                    />
-                    <View style={styles.notesActions}>
-                      <Pressable
-                        style={[styles.notesPrimaryButton, (!noteDraft.trim() || notesBusy) && styles.notesButtonDisabled]}
-                        onPress={handleSaveNote}
-                        disabled={!noteDraft.trim() || notesBusy || !noteTargetDayId}
-                      >
-                        <Text style={styles.notesPrimaryText}>{strings.noteSave}</Text>
-                      </Pressable>
-                      {currentNote ? (
-                        <Pressable
-                          style={[styles.notesGhostButton, notesBusy && styles.notesButtonDisabled]}
-                          onPress={handleDeleteNote}
-                          disabled={notesBusy}
-                        >
-                          <Text style={styles.notesGhostText}>{strings.noteDelete}</Text>
+                  {isPremium ? (
+                    <View style={styles.notesCard}>
+                      <View style={styles.notesHeaderRow}>
+                        <Text style={styles.notesTitle}>{strings.notesTitle}</Text>
+                        <Pressable style={styles.notesLink} onPress={() => setActiveTab('notes')}>
+                          <Text style={styles.notesLinkText}>{strings.notesListTitle}</Text>
                         </Pressable>
-                      ) : null}
+                      </View>
+                      <Text style={styles.notesSubtitle}>
+                        {noteTargetDayId ? strings.noteForDay(noteTargetDayId) : strings.notesSubtitle}
+                      </Text>
+                      <TextInput
+                        style={styles.notesInput}
+                        placeholder={strings.notePlaceholder}
+                        placeholderTextColor={colors.whiteMuted}
+                        value={noteDraft}
+                        onChangeText={setNoteDraft}
+                        multiline
+                        editable={!!noteTargetDayId}
+                      />
+                      <View style={styles.notesActions}>
+                        <Pressable
+                          style={[styles.notesPrimaryButton, (!noteDraft.trim() || notesBusy) && styles.notesButtonDisabled]}
+                          onPress={handleSaveNote}
+                          disabled={!noteDraft.trim() || notesBusy || !noteTargetDayId}
+                        >
+                          <Text style={styles.notesPrimaryText}>{strings.noteSave}</Text>
+                        </Pressable>
+                        {currentNote ? (
+                          <Pressable
+                            style={[styles.notesGhostButton, notesBusy && styles.notesButtonDisabled]}
+                            onPress={handleDeleteNote}
+                            disabled={notesBusy}
+                          >
+                            <Text style={styles.notesGhostText}>{strings.noteDelete}</Text>
+                          </Pressable>
+                        ) : null}
+                      </View>
+                      {notesError ? <Text style={styles.notesError}>{notesError}</Text> : null}
                     </View>
-                    {notesError ? <Text style={styles.notesError}>{notesError}</Text> : null}
-                  </View>
+                  ) : (
+                    <View style={[styles.notesCard, styles.lockedCard]}>
+                      <View style={styles.influenceHeader}>
+                        <Text style={styles.notesTitle}>{strings.notesTitle}</Text>
+                        <MaterialIcons name="lock" size={18} color={colors.whiteMuted} />
+                      </View>
+                      <Text style={styles.lockedText}>{strings.premiumLocked}</Text>
+                      <Pressable style={styles.lockedButton} onPress={openPaywall}>
+                        <Text style={styles.lockedButtonText}>{strings.premiumCta}</Text>
+                      </Pressable>
+                    </View>
+                  )}
                 </View>
 
                 {moonSignCard ? <View style={styles.influenceSection}>{renderCategoryCard(moonSignCard)}</View> : null}
@@ -1636,12 +1739,15 @@ function AppContent() {
                   {moonData.categories.length === 0 ? (
                     <Text style={styles.emptyText}>{strings.noCategoryData}</Text>
                   ) : (
-                    moonData.categories.map((item, index) => (
-                      <React.Fragment key={item.key}>
-                        {renderCategoryCard(item)}
-                        {showAds && (index + 1) % 4 === 0 ? <NativeAdSlot adUnitId={nativeUnitId} /> : null}
-                      </React.Fragment>
-                    ))
+                    moonData.categories.map((item, index) => {
+                      const isLocked = !isPremium && index >= moonData.categories.length - 4;
+                      return (
+                        <React.Fragment key={item.key}>
+                          {isLocked ? renderLockedCategoryCard(item) : renderCategoryCard(item)}
+                          {showAds && (index + 1) % 4 === 0 ? <NativeAdSlot adUnitId={nativeUnitId} /> : null}
+                        </React.Fragment>
+                      );
+                    })
                   )}
                 </View>
               </>
@@ -1657,7 +1763,11 @@ function AppContent() {
               </Pressable>
               <Text style={styles.calendarTitle}>{monthLabel}</Text>
               <Pressable onPress={() => handleMonthShift(1)} style={styles.calendarNavButton}>
-                <MaterialIcons name="chevron-right" size={22} color={colors.whiteMuted} />
+                <MaterialIcons
+                  name={!isPremium && calendarMonth >= new Date(new Date().getFullYear(), new Date().getMonth(), 1) ? 'lock' : 'chevron-right'}
+                  size={22}
+                  color={colors.whiteMuted}
+                />
               </Pressable>
             </View>
 
@@ -1715,7 +1825,18 @@ function AppContent() {
           </View>
         )}
 
-        {activeTab === 'notes' && (
+        {activeTab === 'notes' && !isPremium && (
+          <View style={[styles.premiumGateContainer, showAds && { paddingBottom: 110 + insets.bottom }]}>
+            <MaterialIcons name="lock" size={48} color={colors.whiteMuted} />
+            <Text style={styles.premiumGateTitle}>{strings.premiumTitle}</Text>
+            <Text style={styles.premiumGateSubtitle}>{strings.premiumBenefits[0]}</Text>
+            <Pressable style={styles.premiumGateButton} onPress={openPaywall}>
+              <Text style={styles.premiumGateButtonText}>{strings.premiumCta}</Text>
+            </Pressable>
+          </View>
+        )}
+
+        {activeTab === 'notes' && isPremium && (
           <ScrollView
             contentContainerStyle={[styles.notesContent, showAds && { paddingBottom: 110 + insets.bottom }]}
             showsVerticalScrollIndicator={false}
@@ -1825,7 +1946,7 @@ function AppContent() {
 
             <View style={styles.profileSection}>
               <Text style={styles.profileSectionTitle}>{strings.language}</Text>
-              <View style={styles.profileOptionGroup}>
+              <View style={styles.profileOptionGroupWrap}>
                 <Pressable
                   style={[styles.profileOptionButton, locale === 'en' && styles.profileOptionButtonActive]}
                   onPress={() => handleLanguageSelect('en')}
@@ -1837,6 +1958,12 @@ function AppContent() {
                   onPress={() => handleLanguageSelect('ru')}
                 >
                   <Text style={styles.profileOptionButtonText}>{strings.russian}</Text>
+                </Pressable>
+                <Pressable
+                  style={[styles.profileOptionButton, locale === 'ja' && styles.profileOptionButtonActive]}
+                  onPress={() => handleLanguageSelect('ja')}
+                >
+                  <Text style={styles.profileOptionButtonText}>{strings.japanese}</Text>
                 </Pressable>
               </View>
             </View>
@@ -2067,7 +2194,7 @@ function AppContent() {
         )}
 
         {showAds ? (
-          <View style={[styles.bannerDock, { paddingBottom: Platform.OS === 'android' ? 0 : insets.bottom }]}>
+          <View style={[styles.bannerDock, { paddingBottom: Platform.OS === 'android' ? 10 : insets.bottom }]}>
             <Banner width={bannerWidth} />
           </View>
         ) : null}
@@ -2193,7 +2320,9 @@ function AppContent() {
               </View>
               <View style={styles.paywallActions}>
                 <Pressable style={[styles.paywallPrimary, iapBusy && styles.paywallButtonDisabled]} onPress={handleUnlockPremium} disabled={iapBusy}>
-                  <Text style={styles.paywallPrimaryText}>{strings.premiumCta}</Text>
+                  <Text style={styles.paywallPrimaryText}>
+                    {strings.premiumCta}{productPrice ? `  ${productPrice}` : ''}
+                  </Text>
                 </Pressable>
                 <Pressable style={[styles.paywallSecondary, iapBusy && styles.paywallButtonDisabled]} onPress={handleRestorePremium} disabled={iapBusy}>
                   <Text style={styles.paywallSecondaryText}>{strings.premiumRestore}</Text>
@@ -2205,6 +2334,157 @@ function AppContent() {
             </LinearGradient>
           </View>
         </Modal>
+
+        {onboardingStep !== null && (
+          <LinearGradient
+            colors={onboardingStep === 'theme' ? themes[previewTheme].gradient : theme.gradient}
+            style={styles.onboardingOverlay}
+          >
+            <View style={[styles.onboardingContent, { paddingTop: insets.top + 32, paddingBottom: insets.bottom + 24 }]}>
+
+              {/* step indicator */}
+              <Text style={styles.onboardingStepLabel}>
+                {onboardingStep === 'language' ? '1 / 3' : onboardingStep === 'theme' ? '2 / 3' : '3 / 3'}
+              </Text>
+
+              {/* ── Language step ── */}
+              {onboardingStep === 'language' && (
+                <>
+                  <Text style={styles.onboardingTitle}>{'Language / Язык / 言語'}</Text>
+                  <View style={styles.onboardingButtons}>
+                    <Pressable style={styles.langPickerButton} onPress={() => handleLanguageSelect('en')}>
+                      <Text style={styles.onboardingLangLabel}>English</Text>
+                    </Pressable>
+                    <Pressable style={styles.langPickerButton} onPress={() => handleLanguageSelect('ru')}>
+                      <Text style={styles.onboardingLangLabel}>Русский</Text>
+                    </Pressable>
+                    <Pressable style={styles.langPickerButton} onPress={() => handleLanguageSelect('ja')}>
+                      <Text style={styles.onboardingLangLabel}>日本語</Text>
+                    </Pressable>
+                  </View>
+                </>
+              )}
+
+              {/* ── Theme step ── */}
+              {onboardingStep === 'theme' && (
+                <>
+                  <Text style={styles.onboardingTitle}>{strings.theme}</Text>
+                  <View style={styles.onboardingButtons}>
+                    {([
+                      { key: 'blue-day' as ThemeName, label: strings.themeBlueDay },
+                      { key: 'deep-blue-night' as ThemeName, label: strings.themeDeepBlueNight },
+                      { key: 'raspberry' as ThemeName, label: strings.themeRaspberry },
+                      { key: 'dreamland' as ThemeName, label: strings.themeDreamland },
+                      { key: 'amethyst' as ThemeName, label: strings.themeAmethyst },
+                    ]).map(({ key, label }) => (
+                      <Pressable
+                        key={key}
+                        style={[styles.themePaletteRow, previewTheme === key && styles.themePaletteRowActive]}
+                        onPress={() => setPreviewTheme(key)}
+                      >
+                        <View style={styles.themePaletteSwatches}>
+                          {themes[key].gradient.map((color, i) => (
+                            <View key={i} style={[styles.themeSwatchLarge, { backgroundColor: color }]} />
+                          ))}
+                        </View>
+                        <Text style={styles.onboardingThemeLabel}>{label}</Text>
+                      </Pressable>
+                    ))}
+                  </View>
+                  <Pressable
+                    style={styles.onboardingNextButton}
+                    onPress={() => {
+                      handleThemeSelect(previewTheme);
+                      setOnboardingStep('city');
+                    }}
+                  >
+                    <Text style={styles.onboardingNextButtonText}>{strings.next}</Text>
+                  </Pressable>
+                </>
+              )}
+
+              {/* ── City step ── */}
+              {onboardingStep === 'city' && (
+                <>
+                  <Text style={styles.onboardingTitle}>{strings.chooseCity}</Text>
+                  <Text style={styles.onboardingHint}>{strings.onboardingCityHint}</Text>
+
+                  {/* previously saved city (for migrating users) */}
+                  {city && (
+                    <View style={styles.onboardingPrevCity}>
+                      <Text style={styles.onboardingPrevLabel}>{strings.onboardingPreviousCity}</Text>
+                      <Pressable style={styles.langPickerButton} onPress={() => { setOnboardingStep(null); }}>
+                        <Text style={styles.langPickerButtonText}>{city.name}</Text>
+                      </Pressable>
+                    </View>
+                  )}
+
+                  <TextInput
+                    style={styles.searchInput}
+                    placeholder={strings.searchCities}
+                    placeholderTextColor={colors.whiteMuted}
+                    value={cityQuery}
+                    onChangeText={setCityQuery}
+                  />
+
+                  {cityLoading ? (
+                    <ActivityIndicator color={colors.white} style={{ marginTop: 16 }} />
+                  ) : (
+                    <FlatList
+                      data={filteredCities}
+                      keyExtractor={(item) => item.name}
+                      showsVerticalScrollIndicator={false}
+                      contentContainerStyle={styles.cityList}
+                      keyboardShouldPersistTaps="handled"
+                      ListEmptyComponent={<Text style={styles.emptyText}>{strings.noCities}</Text>}
+                      renderItem={({ item }) => (
+                        <Pressable style={styles.cityRow} onPress={() => handleCitySelect(item)}>
+                          <Text style={styles.cityName}>{item.name}</Text>
+                          <MaterialIcons name="chevron-right" size={18} color={colors.whiteMuted} />
+                        </Pressable>
+                      )}
+                    />
+                  )}
+
+                  {/* custom city form */}
+                  <View style={styles.onboardingCustomCity}>
+                    <Text style={styles.onboardingCustomCityLabel}>{strings.onboardingCityCustom}</Text>
+                    <TextInput
+                      style={styles.searchInput}
+                      placeholder={strings.cityNameLabel}
+                      placeholderTextColor={colors.whiteMuted}
+                      value={customCityName}
+                      onChangeText={setCustomCityName}
+                    />
+                    <View style={styles.onboardingCoordRow}>
+                      <TextInput
+                        style={[styles.searchInput, { flex: 1 }]}
+                        placeholder={strings.latitudeLabel}
+                        placeholderTextColor={colors.whiteMuted}
+                        value={customLatitude}
+                        onChangeText={setCustomLatitude}
+                        keyboardType="decimal-pad"
+                      />
+                      <TextInput
+                        style={[styles.searchInput, { flex: 1 }]}
+                        placeholder={strings.longitudeLabel}
+                        placeholderTextColor={colors.whiteMuted}
+                        value={customLongitude}
+                        onChangeText={setCustomLongitude}
+                        keyboardType="decimal-pad"
+                      />
+                    </View>
+                    <Pressable style={styles.langPickerButton} onPress={handleSaveCustomCity}>
+                      <Text style={styles.langPickerButtonText}>{strings.saveCustomCity}</Text>
+                    </Pressable>
+                  </View>
+                </>
+              )}
+
+            </View>
+          </LinearGradient>
+        )}
+
         {snackbarVisible ? (
           <View style={[styles.snackbar, { bottom: 24 + insets.bottom }]}>
             <Text style={styles.snackbarText}>{snackbarMessage}</Text>
@@ -2223,7 +2503,7 @@ export default function App() {
   );
 }
 
-const createStyles = (scale: number, theme: typeof themes.raspberry) => {
+const createStyles = (scale: number, theme: (typeof themes)[ThemeName]) => {
   const fs = (value: number) => value * scale + 3;
   const ls = (value: number) => value * scale;
   return StyleSheet.create({
@@ -2469,7 +2749,7 @@ const createStyles = (scale: number, theme: typeof themes.raspberry) => {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      paddingVertical: 6,
+      paddingVertical: 8,
     },
     profileRowLabel: {
       color: colors.whiteMuted,
@@ -2486,150 +2766,150 @@ const createStyles = (scale: number, theme: typeof themes.raspberry) => {
       fontFamily: 'SpaceGrotesk_500Medium',
       fontSize: fs(12),
     },
-  bannerDock: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    alignItems: 'stretch',
-    paddingHorizontal: 0,
-  },
-  rateOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(4, 4, 8, 0.65)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-  },
-  rateSheet: {
-    width: '100%',
-    maxWidth: 420,
-    borderRadius: 26,
-    backgroundColor: theme.modalBg,
-    borderWidth: 1,
-    borderColor: theme.cardBorder,
-    padding: 22,
-    paddingBottom: 24,
-  },
-  rateHeaderRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    marginBottom: 12,
-  },
-  rateIconWrap: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
-    backgroundColor: 'rgba(224,176,255,0.12)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(224,176,255,0.3)',
-  },
-  rateHeaderText: {
-    flex: 1,
-  },
-  rateTitle: {
-    color: colors.white,
-    fontFamily: 'SpaceGrotesk_700Bold',
-    fontSize: fs(18),
-  },
-  rateSubtitle: {
-    color: colors.whiteMuted,
-    fontFamily: 'SpaceGrotesk_500Medium',
-    fontSize: fs(11),
-    marginTop: 2,
-    textTransform: 'uppercase',
-    letterSpacing: ls(1.2),
-  },
-  rateBody: {
-    color: colors.whiteSoft,
-    fontFamily: 'SpaceGrotesk_400Regular',
-    fontSize: fs(13),
-    lineHeight: fs(18),
-  },
-  rateActionsColumn: {
-    marginTop: 18,
-    gap: 10,
-  },
-  rateButton: {
-    borderRadius: 14,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  rateButtonPrimary: {
-    backgroundColor: colors.lavender,
-  },
-  rateButtonPrimaryText: {
-    color: colors.charcoal,
-    fontFamily: 'SpaceGrotesk_700Bold',
-    fontSize: fs(12),
-    textTransform: 'uppercase',
-    letterSpacing: ls(1.2),
-  },
-  rateButtonGhost: {
-    backgroundColor: 'rgba(255,255,255,0.08)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.12)',
-  },
-  rateButtonGhostText: {
-    color: colors.whiteSoft,
-    fontFamily: 'SpaceGrotesk_500Medium',
-    fontSize: fs(12),
-  },
-  rateButtonOutline: {
-    borderWidth: 1,
-    borderColor: 'rgba(230,230,250,0.4)',
-  },
-  rateButtonOutlineText: {
-    color: colors.lavender,
-    fontFamily: 'SpaceGrotesk_500Medium',
-    fontSize: fs(12),
-  },
-  moreAppsSection: {
-    marginTop: 6,
-  },
-  moreAppsLabel: {
-    color: colors.whiteMuted,
-    fontFamily: 'SpaceGrotesk_500Medium',
-    fontSize: fs(11),
-    textTransform: 'uppercase',
-    letterSpacing: ls(1.4),
-    marginBottom: 10,
-  },
-  moreAppsList: {
-    paddingRight: 12,
-  },
-  moreAppCard: {
-    width: 86,
-    marginRight: 12,
-    alignItems: 'center',
-  },
-  moreAppIconWrap: {
-    width: 64,
-    height: 64,
-    borderRadius: 18,
-    backgroundColor: theme.cardBg,
-    borderWidth: 1,
-    borderColor: theme.cardBorder,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 8,
-  },
-  moreAppIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 12,
-  },
-  moreAppName: {
-    color: colors.whiteSoft,
-    fontFamily: 'SpaceGrotesk_500Medium',
-    fontSize: fs(10),
-    textAlign: 'center',
-  },
+    bannerDock: {
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      bottom: 0,
+      alignItems: 'stretch',
+      paddingHorizontal: 0,
+    },
+    rateOverlay: {
+      flex: 1,
+      backgroundColor: 'rgba(4, 4, 8, 0.65)',
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingHorizontal: 24,
+    },
+    rateSheet: {
+      width: '100%',
+      maxWidth: 420,
+      borderRadius: 26,
+      backgroundColor: theme.modalBg,
+      borderWidth: 1,
+      borderColor: theme.cardBorder,
+      padding: 22,
+      paddingBottom: 24,
+    },
+    rateHeaderRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+      marginBottom: 12,
+    },
+    rateIconWrap: {
+      width: 44,
+      height: 44,
+      borderRadius: 14,
+      backgroundColor: 'rgba(224,176,255,0.12)',
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderWidth: 1,
+      borderColor: 'rgba(224,176,255,0.3)',
+    },
+    rateHeaderText: {
+      flex: 1,
+    },
+    rateTitle: {
+      color: colors.white,
+      fontFamily: 'SpaceGrotesk_700Bold',
+      fontSize: fs(18),
+    },
+    rateSubtitle: {
+      color: colors.whiteMuted,
+      fontFamily: 'SpaceGrotesk_500Medium',
+      fontSize: fs(11),
+      marginTop: 2,
+      textTransform: 'uppercase',
+      letterSpacing: ls(1.2),
+    },
+    rateBody: {
+      color: colors.whiteSoft,
+      fontFamily: 'SpaceGrotesk_400Regular',
+      fontSize: fs(13),
+      lineHeight: fs(18),
+    },
+    rateActionsColumn: {
+      marginTop: 18,
+      gap: 10,
+    },
+    rateButton: {
+      borderRadius: 14,
+      paddingVertical: 10,
+      paddingHorizontal: 16,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    rateButtonPrimary: {
+      backgroundColor: colors.lavender,
+    },
+    rateButtonPrimaryText: {
+      color: colors.charcoal,
+      fontFamily: 'SpaceGrotesk_700Bold',
+      fontSize: fs(12),
+      textTransform: 'uppercase',
+      letterSpacing: ls(1.2),
+    },
+    rateButtonGhost: {
+      backgroundColor: 'rgba(255,255,255,0.08)',
+      borderWidth: 1,
+      borderColor: 'rgba(255,255,255,0.12)',
+    },
+    rateButtonGhostText: {
+      color: colors.whiteSoft,
+      fontFamily: 'SpaceGrotesk_500Medium',
+      fontSize: fs(12),
+    },
+    rateButtonOutline: {
+      borderWidth: 1,
+      borderColor: 'rgba(230,230,250,0.4)',
+    },
+    rateButtonOutlineText: {
+      color: colors.lavender,
+      fontFamily: 'SpaceGrotesk_500Medium',
+      fontSize: fs(12),
+    },
+    moreAppsSection: {
+      marginTop: 6,
+    },
+    moreAppsLabel: {
+      color: colors.whiteMuted,
+      fontFamily: 'SpaceGrotesk_500Medium',
+      fontSize: fs(11),
+      textTransform: 'uppercase',
+      letterSpacing: ls(1.4),
+      marginBottom: 10,
+    },
+    moreAppsList: {
+      paddingRight: 12,
+    },
+    moreAppCard: {
+      width: 86,
+      marginRight: 12,
+      alignItems: 'center',
+    },
+    moreAppIconWrap: {
+      width: 64,
+      height: 64,
+      borderRadius: 18,
+      backgroundColor: theme.cardBg,
+      borderWidth: 1,
+      borderColor: theme.cardBorder,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: 8,
+    },
+    moreAppIcon: {
+      width: 48,
+      height: 48,
+      borderRadius: 12,
+    },
+    moreAppName: {
+      color: colors.whiteSoft,
+      fontFamily: 'SpaceGrotesk_500Medium',
+      fontSize: fs(10),
+      textAlign: 'center',
+    },
     profileField: {
       gap: 6,
     },
@@ -2752,9 +3032,6 @@ const createStyles = (scale: number, theme: typeof themes.raspberry) => {
       justifyContent: 'space-between',
       paddingVertical: 6,
     },
-    profileRow: {
-      paddingVertical: 8,
-    },
     profileLabel: {
       color: colors.whiteMuted,
       fontFamily: 'SpaceGrotesk_500Medium',
@@ -2801,7 +3078,6 @@ const createStyles = (scale: number, theme: typeof themes.raspberry) => {
       width: 200,
       height: 200,
       borderRadius: 999,
-      backgroundColor: 'rgba(139, 0, 75, 0.35)',
     },
     moonHaloTwo: {
       position: 'absolute',
@@ -2872,8 +3148,8 @@ const createStyles = (scale: number, theme: typeof themes.raspberry) => {
     },
     phaseTitle: {
       color: colors.white,
-      fontFamily: 'SpaceGrotesk_700Bold',
-      fontSize: fs(28),
+      fontFamily: 'CormorantGaramond_600SemiBold',
+      fontSize: fs(32),
       marginBottom: 8,
     },
     phaseMeta: {
@@ -2971,7 +3247,16 @@ const createStyles = (scale: number, theme: typeof themes.raspberry) => {
       borderWidth: 1,
       borderColor: 'rgba(255,255,255,0.08)',
     },
-    lunarDayRangeRowActive: {
+    lunarDayRangeRowActive: theme.name === 'blue-day' ? {
+      backgroundColor: 'rgba(255,255,255,0.18)',
+      borderColor: 'rgba(255,255,255,0.75)',
+      borderWidth: 2,
+      elevation: 4,
+      shadowColor: '#4FA3FF',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.5,
+      shadowRadius: 8,
+    } : {
       backgroundColor: theme.pillBg,
       borderColor: theme.pillBorder,
     },
@@ -2986,11 +3271,16 @@ const createStyles = (scale: number, theme: typeof themes.raspberry) => {
       borderWidth: 1,
       borderColor: theme.pillBorder,
     },
+    lunarDayRangeBadgeActive: theme.name === 'blue-day' ? {
+      backgroundColor: colors.accentBlue,
+      borderColor: colors.white,
+    } : {},
     lunarDayRangeNumber: {
       color: colors.white,
       fontFamily: 'SpaceGrotesk_700Bold',
       fontSize: fs(12),
     },
+    lunarDayRangeNumberActive: {},
     lunarDayRangeLabel: {
       color: colors.white,
       fontFamily: 'SpaceGrotesk_500Medium',
@@ -3225,6 +3515,40 @@ const createStyles = (scale: number, theme: typeof themes.raspberry) => {
     lockedCard: {
       opacity: 0.8,
     },
+    premiumGateContainer: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 16,
+      padding: 32,
+    },
+    premiumGateTitle: {
+      color: colors.white,
+      fontFamily: 'SpaceGrotesk_700Bold',
+      fontSize: fs(20),
+      textAlign: 'center',
+    },
+    premiumGateSubtitle: {
+      color: colors.whiteMuted,
+      fontFamily: 'SpaceGrotesk_400Regular',
+      fontSize: fs(14),
+      textAlign: 'center',
+      lineHeight: fs(14) * 1.5,
+    },
+    premiumGateButton: {
+      marginTop: 8,
+      paddingVertical: 12,
+      paddingHorizontal: 28,
+      borderRadius: 24,
+      backgroundColor: theme.pillBg,
+      borderWidth: 1,
+      borderColor: theme.pillBorder,
+    },
+    premiumGateButtonText: {
+      color: colors.white,
+      fontFamily: 'SpaceGrotesk_700Bold',
+      fontSize: fs(14),
+    },
     lockedText: {
       color: colors.whiteMuted,
       fontFamily: 'SpaceGrotesk_400Regular',
@@ -3349,6 +3673,151 @@ const createStyles = (scale: number, theme: typeof themes.raspberry) => {
     },
     paywallActions: {
       gap: 10,
+    },
+    langPickerBackdrop: {
+      flex: 1,
+      backgroundColor: 'rgba(0,0,0,0.6)',
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: 32,
+    },
+    langPickerSheet: {
+      width: '100%',
+      borderRadius: 24,
+      paddingHorizontal: 24,
+      paddingTop: 24,
+      paddingBottom: 28,
+    },
+    onboardingOverlay: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      zIndex: 100,
+    },
+    onboardingContent: {
+      flex: 1,
+      paddingHorizontal: 24,
+      gap: 12,
+    },
+    onboardingStepLabel: {
+      color: colors.whiteMuted,
+      fontFamily: 'SpaceGrotesk_500Medium',
+      fontSize: fs(11),
+      letterSpacing: ls(2),
+      textTransform: 'uppercase',
+      textAlign: 'center',
+    },
+    onboardingTitle: {
+      color: colors.white,
+      fontFamily: 'SpaceGrotesk_700Bold',
+      fontSize: fs(22),
+      textAlign: 'center',
+      marginBottom: 4,
+    },
+    onboardingHint: {
+      color: colors.whiteMuted,
+      fontFamily: 'SpaceGrotesk_400Regular',
+      fontSize: fs(12),
+      textAlign: 'center',
+      lineHeight: fs(12) * 1.5,
+    },
+    onboardingButtons: {
+      gap: 12,
+      marginTop: 8,
+    },
+    onboardingPrevCity: {
+      gap: 8,
+    },
+    onboardingPrevLabel: {
+      color: colors.whiteMuted,
+      fontFamily: 'SpaceGrotesk_500Medium',
+      fontSize: fs(11),
+      letterSpacing: ls(1),
+      textTransform: 'uppercase',
+    },
+    onboardingCustomCity: {
+      gap: 8,
+      paddingTop: 8,
+      borderTopWidth: 1,
+      borderTopColor: 'rgba(255,255,255,0.12)',
+    },
+    onboardingCustomCityLabel: {
+      color: colors.whiteMuted,
+      fontFamily: 'SpaceGrotesk_500Medium',
+      fontSize: fs(11),
+      letterSpacing: ls(1),
+      textTransform: 'uppercase',
+    },
+    onboardingCoordRow: {
+      flexDirection: 'row',
+      gap: 8,
+    },
+    themePaletteRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+      paddingVertical: 12,
+      paddingHorizontal: 14,
+      borderRadius: 16,
+      backgroundColor: 'rgba(255,255,255,0.08)',
+      borderWidth: 1.5,
+      borderColor: 'rgba(255,255,255,0.12)',
+    },
+    themePaletteRowActive: {
+      backgroundColor: 'rgba(255,255,255,0.2)',
+      borderColor: colors.white,
+    },
+    themePaletteSwatches: {
+      flexDirection: 'row',
+      gap: 4,
+    },
+    themeSwatchLarge: {
+      width: 24,
+      height: 24,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: 'rgba(255,255,255,0.25)',
+    },
+    onboardingNextButton: {
+      marginTop: 12,
+      paddingVertical: 14,
+      borderRadius: 16,
+      alignItems: 'center',
+      backgroundColor: colors.jade,
+    },
+    onboardingNextButtonText: {
+      color: '#0A0A0A',
+      fontFamily: 'SpaceGrotesk_700Bold',
+      fontSize: fs(16),
+    },
+    langPickerButton: {
+      paddingVertical: 14,
+      borderRadius: 16,
+      alignItems: 'center',
+      backgroundColor: 'rgba(255,255,255,0.14)',
+      borderWidth: 1,
+      borderColor: 'rgba(255,255,255,0.28)',
+    },
+    langPickerButtonActive: {
+      backgroundColor: 'rgba(255,255,255,0.28)',
+      borderColor: colors.white,
+    },
+    langPickerButtonText: {
+      color: colors.white,
+      fontFamily: 'SpaceGrotesk_600SemiBold',
+      fontSize: fs(16),
+    },
+    onboardingThemeLabel: {
+      color: colors.white,
+      fontFamily: 'SpaceGrotesk_500Medium',
+      fontSize: fs(11),
+    },
+    onboardingLangLabel: {
+      color: colors.white,
+      fontFamily: 'SpaceGrotesk_500Medium',
+      fontSize: fs(14),
     },
     paywallPrimary: {
       backgroundColor: colors.jade,

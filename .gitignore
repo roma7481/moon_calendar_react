@@ -8,8 +8,13 @@ build/
 .gradle-tmp/
 *.log
 .DS_Store
-package-lock.json
 google-services.json
 GoogleService-Info.plist
 *.apk
 *.aab
+my_android_key_diy.jks
+*.jks
+*.keystore
+*.env
+.env
+scripts/.env

@@ -49,6 +49,7 @@ export const themes = {
     calendarCellBg: 'rgba(255,255,255,0.14)',
     calendarCellBorder: 'rgba(255,255,255,0.28)',
     modalBg: '#2B4CA8',
+    moonHalo: 'rgba(79,163,255,0.35)',
   },
   'deep-blue-night': {
     name: 'deep-blue-night',
@@ -64,6 +65,7 @@ export const themes = {
     calendarCellBg: 'rgba(255,255,255,0.10)',
     calendarCellBorder: 'rgba(255,255,255,0.2)',
     modalBg: '#14234B',
+    moonHalo: 'rgba(111,168,255,0.35)',
   },
   raspberry: {
     name: 'raspberry',
@@ -79,6 +81,7 @@ export const themes = {
     calendarCellBg: 'rgba(255,255,255,0.06)',
     calendarCellBorder: 'rgba(255,255,255,0.1)',
     modalBg: '#2A0014',
+    moonHalo: 'rgba(139, 0, 75, 0.35)',
   },
   dreamland: {
     name: 'dreamland',
@@ -94,6 +97,7 @@ export const themes = {
     calendarCellBg: 'rgba(10,12,14,0.6)',
     calendarCellBorder: 'rgba(57,199,209,0.2)',
     modalBg: '#0F171B',
+    moonHalo: 'rgba(57,199,209,0.35)',
   },
   amethyst: {
     name: 'amethyst',
@@ -109,5 +113,6 @@ export const themes = {
     calendarCellBg: 'rgba(75,0,130,0.2)',
     calendarCellBorder: 'rgba(138,43,226,0.2)',
     modalBg: '#1A0B2E',
+    moonHalo: 'rgba(224,176,255,0.35)',
   },
 } as const;

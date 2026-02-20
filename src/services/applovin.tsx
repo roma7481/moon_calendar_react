@@ -1,61 +1,94 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
 import type { ConsentFlags } from './ads';
 
-const AppLovinMAX: any = (() => {
-  try {
-    const mod = require('react-native-applovin-max');
-    return mod.default || mod;
-  } catch {
-    return null;
-  }
-})();
+const AppLovinMAXModule = require('react-native-applovin-max');
+const AppLovinMAX = AppLovinMAXModule.default || AppLovinMAXModule;
+const AdFormat = AppLovinMAXModule.AdFormat || AppLovinMAX.AdFormat;
+const AdView = AppLovinMAXModule.AdView || AppLovinMAX.AdView;
 
 const SDK_KEY = 'qnL2sJHf5VT2RFA26vgN2heXM-Lpfdo4FPKD_09zl9TnHlPVSmGcSRPIQKwcsZwKIWCJZ62BtOONX_7JNmPDX_';
 const BANNER_ID = 'ccf472bfd1e7b554';
 const INTERSTITIAL_ID = '3447e13237c71aa3';
 const MREC_ID = 'feb46da04bd99e57';
 
+let isInitialized = false;
+const initCallbacks = new Set<(val: boolean) => void>();
+
 export const initAppLovin = async (consent: ConsentFlags) => {
-  console.log('[AppLovin] Initializing... AppLovinMAX exists:', !!AppLovinMAX);
-  if (AppLovinMAX) {
-    console.log('[AppLovin] Members:', Object.keys(AppLovinMAX));
-  }
-  if (!AppLovinMAX) return;
-  if (typeof AppLovinMAX.setHasUserConsent === 'function') {
+  if (AppLovinMAX && typeof AppLovinMAX.setHasUserConsent === 'function') {
     AppLovinMAX.setHasUserConsent(consent.hasUserConsent);
   }
-  if (typeof AppLovinMAX.setIsAgeRestrictedUser === 'function') {
+  if (AppLovinMAX && typeof AppLovinMAX.setIsAgeRestrictedUser === 'function') {
     AppLovinMAX.setIsAgeRestrictedUser(consent.isAgeRestrictedUser);
   }
-  if (typeof AppLovinMAX.setDoNotSell === 'function') {
+  if (AppLovinMAX && typeof AppLovinMAX.setDoNotSell === 'function') {
     AppLovinMAX.setDoNotSell(consent.doNotSell);
   }
-  if (typeof AppLovinMAX.initialize === 'function') {
-    console.log('[AppLovin] Calling initialize with key:', SDK_KEY.slice(0, 10) + '...');
-    return new Promise<void>((resolve) => {
-      AppLovinMAX.initialize(SDK_KEY, (configuration: any) => {
-        console.log('[AppLovin] Initialization complete. Configuration:', configuration);
-        resolve();
-      });
-    });
+
+  try {
+    if (AppLovinMAX && typeof AppLovinMAX.initialize === 'function') {
+      await AppLovinMAX.initialize(SDK_KEY);
+      isInitialized = true;
+      initCallbacks.forEach(cb => cb(true));
+    }
+  } catch (error) {
+    // Silently fail to not disrupt user experience
   }
 };
 
 export const AppLovinBanner = () => {
-  if (!AppLovinMAX?.AdView || !AppLovinMAX?.MaxAdFormat) return null;
+  const [initialized, setInitialized] = useState(isInitialized);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    if (isInitialized) return;
+    const cb = (val: boolean) => setInitialized(val);
+    initCallbacks.add(cb);
+    return () => {
+      initCallbacks.delete(cb);
+    };
+  }, []);
+
+  if (!initialized || !AdView || !AdFormat) return null;
+
   return (
-    <View style={styles.bannerWrap}>
-      <AppLovinMAX.AdView adUnitId={BANNER_ID} adFormat={AppLovinMAX.MaxAdFormat.BANNER} style={styles.banner} />
+    <View style={[styles.bannerWrap, !visible && { height: 0 }]}>
+      <AdView
+        adUnitId={BANNER_ID}
+        adFormat={AdFormat.BANNER}
+        style={styles.banner}
+        onAdLoaded={() => setVisible(true)}
+        onAdLoadFailed={() => setVisible(false)}
+      />
     </View>
   );
 };
 
 export const AppLovinMrec = () => {
-  if (!AppLovinMAX?.AdView || !AppLovinMAX?.MaxAdFormat) return null;
+  const [initialized, setInitialized] = useState(isInitialized);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    if (isInitialized) return;
+    const cb = (val: boolean) => setInitialized(val);
+    initCallbacks.add(cb);
+    return () => {
+      initCallbacks.delete(cb);
+    };
+  }, []);
+
+  if (!initialized || !AdView || !AdFormat) return null;
+
   return (
-    <View style={styles.mrecWrap}>
-      <AppLovinMAX.AdView adUnitId={MREC_ID} adFormat={AppLovinMAX.MaxAdFormat.MREC} style={styles.mrec} />
+    <View style={[styles.mrecWrap, !visible && { height: 0, marginVertical: 0 }]}>
+      <AdView
+        adUnitId={MREC_ID}
+        adFormat={AdFormat.MREC}
+        style={styles.mrec}
+        onAdLoaded={() => setVisible(true)}
+        onAdLoadFailed={() => setVisible(false)}
+      />
     </View>
   );
 };
@@ -69,21 +102,36 @@ export type AppLovinInterstitial = {
 
 export const createAppLovinInterstitial = (): AppLovinInterstitial => {
   const closeHandlers = new Set<() => void>();
-  let removeHiddenListener: (() => void) | null = null;
 
-  if (AppLovinMAX?.addInterstitialHiddenEventListener) {
-    const sub = AppLovinMAX.addInterstitialHiddenEventListener(() => {
-      closeHandlers.forEach((handler) => handler());
-    });
-    removeHiddenListener = () => sub?.remove?.();
+  const hiddenHandler = () => {
+    closeHandlers.forEach((handler) => handler());
+  };
+  const displayFailedHandler = () => {
+    closeHandlers.forEach((handler) => handler());
+  };
+
+  if (AppLovinMAX && typeof AppLovinMAX.addEventListener === 'function') {
+    AppLovinMAX.addEventListener('OnInterstitialHiddenEvent', hiddenHandler);
+    AppLovinMAX.addEventListener('OnInterstitialAdDisplayFailedEvent', displayFailedHandler);
   }
 
   return {
     load: () => {
-      AppLovinMAX?.loadInterstitial?.(INTERSTITIAL_ID);
+      if (AppLovinMAX && typeof AppLovinMAX.loadInterstitial === 'function') {
+        AppLovinMAX.loadInterstitial(INTERSTITIAL_ID);
+      }
     },
     show: async () => {
-      await AppLovinMAX?.showInterstitial?.(INTERSTITIAL_ID);
+      if (AppLovinMAX && typeof AppLovinMAX.isInterstitialReady === 'function') {
+        const isReady = await AppLovinMAX.isInterstitialReady(INTERSTITIAL_ID);
+        if (isReady) {
+          AppLovinMAX.showInterstitial(INTERSTITIAL_ID, undefined, undefined);
+        } else {
+          AppLovinMAX.loadInterstitial(INTERSTITIAL_ID);
+        }
+      } else if (AppLovinMAX && typeof AppLovinMAX.showInterstitial === 'function') {
+        AppLovinMAX.showInterstitial(INTERSTITIAL_ID, undefined, undefined);
+      }
     },
     addAdEventListener: (_type, handler) => {
       closeHandlers.add(handler);
@@ -93,7 +141,10 @@ export const createAppLovinInterstitial = (): AppLovinInterstitial => {
     },
     removeAllListeners: () => {
       closeHandlers.clear();
-      removeHiddenListener?.();
+      if (AppLovinMAX && typeof AppLovinMAX.removeEventListener === 'function') {
+        AppLovinMAX.removeEventListener('OnInterstitialHiddenEvent', hiddenHandler);
+        AppLovinMAX.removeEventListener('OnInterstitialAdDisplayFailedEvent', displayFailedHandler);
+      }
     },
   };
 };
@@ -102,6 +153,8 @@ const styles = StyleSheet.create({
   bannerWrap: {
     alignItems: 'center',
     width: '100%',
+    height: 50,
+    overflow: 'hidden',
   },
   banner: {
     width: '100%',
@@ -110,6 +163,9 @@ const styles = StyleSheet.create({
   mrecWrap: {
     alignItems: 'center',
     marginVertical: 10,
+    width: '100%',
+    height: 250,
+    overflow: 'hidden',
   },
   mrec: {
     width: 300,

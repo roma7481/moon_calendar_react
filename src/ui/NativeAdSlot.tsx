@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import {
   NativeAd,
   NativeAdView,
@@ -62,27 +62,51 @@ const NativeAdSlot: React.FC<Props> = ({ adUnitId }) => {
 
   return (
     <NativeAdView nativeAd={nativeAd} style={styles.container}>
-      <View style={styles.row}>
-        {nativeAd.icon?.url ? (
-          <NativeAsset assetType={NativeAssetType.ICON}>
-            <Image source={{ uri: nativeAd.icon.url }} style={styles.icon} />
-          </NativeAsset>
-        ) : null}
+      <View style={styles.header}>
+        <View style={styles.iconWrapper}>
+          {nativeAd.icon?.url ? (
+            <NativeAsset assetType={NativeAssetType.ICON}>
+              <Image source={{ uri: nativeAd.icon.url }} style={styles.icon} />
+            </NativeAsset>
+          ) : (
+            <View style={[styles.icon, { backgroundColor: colors.glass }]} />
+          )}
+        </View>
+
         <View style={styles.texts}>
-          <NativeAsset assetType={NativeAssetType.HEADLINE}>
-            <Text style={styles.title}>{nativeAd.headline}</Text>
-          </NativeAsset>
+          <View style={styles.titleRow}>
+            <NativeAsset assetType={NativeAssetType.HEADLINE}>
+              <Text style={styles.title} numberOfLines={1}>
+                {nativeAd.headline}
+              </Text>
+            </NativeAsset>
+            <View style={styles.adBadge}>
+              <Text style={styles.adBadgeText}>AD</Text>
+            </View>
+          </View>
+
           {nativeAd.body ? (
             <NativeAsset assetType={NativeAssetType.BODY}>
-              <Text style={styles.subtitle}>{nativeAd.body}</Text>
+              <Text style={styles.subtitle} numberOfLines={2}>
+                {nativeAd.body}
+              </Text>
             </NativeAsset>
           ) : null}
         </View>
-        <Text style={styles.adBadge}>Ad</Text>
       </View>
-      {nativeAd.mediaContent ? <NativeMediaView style={styles.media} /> : null}
+
+      {nativeAd.mediaContent ? (
+        <View style={styles.mediaContainer}>
+          <NativeMediaView style={styles.media} />
+        </View>
+      ) : null}
+
       <NativeAsset assetType={NativeAssetType.CALL_TO_ACTION}>
-        <Text style={styles.cta}>{(nativeAd.callToAction || 'Open').toUpperCase()}</Text>
+        <View style={styles.ctaButton}>
+          <Text style={styles.ctaText}>
+            {(nativeAd.callToAction || 'Learn More').toUpperCase()}
+          </Text>
+        </View>
       </NativeAsset>
     </NativeAdView>
   );
@@ -90,53 +114,96 @@ const NativeAdSlot: React.FC<Props> = ({ adUnitId }) => {
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: 12,
+    borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#ffffff30',
-    padding: 12,
-    marginVertical: 10,
-    backgroundColor: '#ffffff12',
+    borderColor: 'rgba(255, 255, 255, 0.15)',
+    padding: 16,
+    marginVertical: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+    elevation: 10,
   },
-  row: {
+  header: {
     flexDirection: 'row',
-    alignItems: 'center',
+    marginBottom: 14,
+  },
+  iconWrapper: {
+    marginRight: 12,
   },
   icon: {
-    width: 40,
-    height: 40,
-    borderRadius: 8,
-    marginRight: 10,
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
-  texts: { flex: 1 },
+  texts: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
   title: {
     color: colors.white,
-    fontWeight: '600',
+    fontSize: 16,
+    fontWeight: '700',
+    flex: 1,
+    marginRight: 8,
   },
   subtitle: {
-    color: colors.whiteMuted,
-    marginTop: 2,
+    color: colors.whiteSoft,
+    fontSize: 13,
+    lineHeight: 18,
   },
   adBadge: {
-    color: colors.whiteMuted,
-    borderWidth: 1,
-    borderColor: '#ffffff30',
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
     paddingHorizontal: 6,
     paddingVertical: 2,
-    borderRadius: 6,
-    fontSize: 10,
-    marginLeft: 8,
+    borderRadius: 4,
+    borderWidth: 0.5,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
+  },
+  adBadgeText: {
+    color: colors.whiteMuted,
+    fontSize: 9,
+    fontWeight: '800',
+  },
+  mediaContainer: {
+    width: '100%',
+    borderRadius: 15,
+    overflow: 'hidden',
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    marginBottom: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.05)',
   },
   media: {
-    marginTop: 8,
     width: '100%',
-    height: 120,
-    borderRadius: 10,
-    overflow: 'hidden',
+    aspectRatio: 1.77, // Standard 16:9 aspect ratio
   },
-  cta: {
-    marginTop: 8,
-    color: colors.white,
-    fontWeight: '700',
+  ctaButton: {
+    backgroundColor: colors.jade,
+    borderRadius: 12,
+    paddingVertical: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: colors.jade,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+  },
+  ctaText: {
+    color: '#0A0A0A',
+    fontSize: 14,
+    fontWeight: '800',
+    letterSpacing: 0.5,
   },
 });
 

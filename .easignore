@@ -1,0 +1,21 @@
+node_modules/
+.expo/
+android/
+ios/
+bin/
+build/
+.gradle/
+.gradle-tmp/
+*.log
+.DS_Store
+
+# Include sensitive files for EAS local builds
+# EAS local build copies files using git if available,
+# so these negations ensure they are included even if in .gitignore
+!google-services.json
+!GoogleService-Info.plist
+!my_android_key_diy.jks
+!package-lock.json
+
+*.apk
+*.aab

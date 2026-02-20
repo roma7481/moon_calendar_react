@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import type { ConsentFlags } from './ads';
 import * as Admob from './ads';
 import { AppLovinBanner, AppLovinMrec, createAppLovinInterstitial, initAppLovin } from './applovin';
-import { getRegionCode, getSimCountryCode } from './telephony/simCountry';
+import { getSimCountryCode } from './telephony/simCountry';
 
 export type AdProvider = 'admob' | 'applovin';
 
@@ -41,27 +41,35 @@ export const useAdProvider = () => {
   return current;
 };
 
-const APPLOVIN_COUNTRIES = new Set(['ru', 'ca']);
+const APPLOVIN_COUNTRIES = new Set(['ru']);
 
 const detectProvider = async () => {
   const sim = await getSimCountryCode();
-  const region = getRegionCode();
-  console.log('[AdProvider] Detected SIM:', sim, 'Region:', region);
-  if (sim && APPLOVIN_COUNTRIES.has(sim)) return 'applovin' as AdProvider;
-  if (region && APPLOVIN_COUNTRIES.has(region)) return 'applovin' as AdProvider;
+
+  if (sim && APPLOVIN_COUNTRIES.has(sim)) {
+    return 'applovin' as AdProvider;
+  }
+
   return 'admob' as AdProvider;
 };
 
 export const initAds = async () => {
-  const consent = await Admob.requestConsent();
-  const nextProvider = await detectProvider();
-  setProvider(nextProvider);
-  if (nextProvider === 'applovin') {
-    await initAppLovin(consent);
-  } else {
-    await Admob.initAds(consent);
+  try {
+    const consent = await Admob.requestConsent();
+    const nextProvider = await detectProvider();
+
+    setProvider(nextProvider);
+
+    if (nextProvider === 'applovin') {
+      await initAppLovin(consent);
+    } else {
+      await Admob.initAds(consent);
+    }
+
+    return nextProvider;
+  } catch (error) {
+    throw error;
   }
-  return nextProvider;
 };
 
 export const createInterstitial = (): InterstitialController => {

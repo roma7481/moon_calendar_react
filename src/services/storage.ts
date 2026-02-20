@@ -42,13 +42,13 @@ export const setStoredCity = async (city: City) => {
   ]);
 };
 
-export const getStoredLanguage = async (): Promise<'en' | 'ru' | null> => {
+export const getStoredLanguage = async (): Promise<'en' | 'ru' | 'ja' | null> => {
   const value = await AsyncStorage.getItem(KEYS.LANGUAGE);
-  if (value === 'en' || value === 'ru') return value;
+  if (value === 'en' || value === 'ru' || value === 'ja') return value;
   return null;
 };
 
-export const setStoredLanguage = async (language: 'en' | 'ru') => {
+export const setStoredLanguage = async (language: 'en' | 'ru' | 'ja') => {
   await AsyncStorage.setItem(KEYS.LANGUAGE, language);
 };
 

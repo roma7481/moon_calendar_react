@@ -9,7 +9,23 @@ export const useOtherApps = (locale: string) => {
     setLoading(true);
     try {
       const data = await getOtherApps(locale);
-      setApps(data);
+      if (!data.length && locale !== 'en') {
+        const fallback = await getOtherApps('en');
+        setApps(fallback);
+      } else {
+        setApps(data);
+      }
+    } catch {
+      if (locale !== 'en') {
+        try {
+          const fallback = await getOtherApps('en');
+          setApps(fallback);
+        } catch {
+          setApps([]);
+        }
+      } else {
+        setApps([]);
+      }
     } finally {
       setLoading(false);
     }

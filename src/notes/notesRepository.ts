@@ -1,5 +1,6 @@
-import { initNotesDb, executeNotesSql, NOTES_TABLE } from './notesDb';
+import { initNotesDb, executeNotesSql, NOTES_TABLE, migrateLegacyNotesIfPresent } from './notesDb';
 import { makeMoonDayKey, parseMoonDayId } from './notesMapping';
+import * as FileSystem from 'expo-file-system/legacy';
 
 export type NoteRecord = {
   id: number;
@@ -25,8 +26,15 @@ export const createNotesDbAdapter = (): NotesDbAdapter => ({
 });
 
 export const createNotesRepository = (adapter: NotesDbAdapter) => {
+  let initDone = false;
   const init = async () => {
+    if (initDone) return;
+    // Migrate legacy notes DB from native Android databases/ directory if present
+    // documentDirectory is like: file:///data/user/0/com.crbee.mooncalendar/files/
+    const legacyPath = (FileSystem.documentDirectory ?? '').replace('/files/', '/databases/') + 'DB_NOTES.db';
+    await migrateLegacyNotesIfPresent(legacyPath);
     await initNotesDb();
+    initDone = true;
   };
 
   const mapRow = (row: any): NoteRecord => {

@@ -1,6 +1,6 @@
 import { executeSql } from './db';
 
-export type AppLocale = 'en' | 'ru';
+export type AppLocale = 'en' | 'ru' | 'ja';
 
 export type City = {
   name: string;
@@ -35,7 +35,11 @@ export type ZodiacInfo = {
 
 const runSql = (sql: string, params: (string | number)[] = []) => executeSql(sql, params);
 
-const tableFor = (base: string, locale: AppLocale) => `${base}_${locale === 'ru' ? 'RU' : 'ENG'}`;
+const tableFor = (base: string, locale: AppLocale) => {
+  if (locale === 'ru') return `${base}_RU`;
+  if (locale === 'ja') return `${base}_JA`;
+  return `${base}_ENG`;
+};
 
 export const getCityByName = async (name: string, locale: AppLocale): Promise<City | null> => {
   const tableName = tableFor('CITIES', locale);
@@ -54,9 +58,12 @@ export const getCityByName = async (name: string, locale: AppLocale): Promise<Ci
   };
 };
 
-const getGardenZodiacInfo = async (zodiac: string): Promise<string | null> => {
+const getGardenZodiacInfo = async (zodiac: string, locale: AppLocale): Promise<string | null> => {
+  const tableName = locale === 'ja' ? 'ZODIAC_GARDEN_JA' : locale === 'ru' ? 'ZODIAC_GARDEN_RU' : null;
+  if (!tableName) return null;
+
   const result = await runSql(
-    'select INFO from ZODIAC_GARDEN_RU where ZODIAC = ? collate nocase limit 1',
+    `select INFO from ${tableName} where ZODIAC = ? collate nocase limit 1`,
     [zodiac]
   );
 
@@ -100,8 +107,8 @@ export const getMoonDayInfo = async (
 
   let garden = row.GARDEN;
 
-  if (locale === 'ru' && zodiac) {
-    const zodiacInfo = await getGardenZodiacInfo(zodiac);
+  if ((locale === 'ru' || locale === 'ja') && zodiac) {
+    const zodiacInfo = await getGardenZodiacInfo(zodiac, locale);
     if (zodiacInfo) {
       garden = `${garden ?? ''}\n\n${zodiacInfo}`.trim();
     }
@@ -129,7 +136,7 @@ export const getMoonDayInfo = async (
 
 export const getAllCities = async (locale: AppLocale): Promise<City[]> => {
   const tableName = tableFor('CITIES', locale);
-  const result = await runSql(`select NAME, LATITUDE, LONGITUDE from ${tableName} order by NAME asc`);
+  const result = await runSql(`select NAME, LATITUDE, LONGITUDE from ${tableName} group by NAME order by NAME asc`);
   const cities: City[] = [];
   for (let i = 0; i < result.rows.length; i += 1) {
     const row = result.rows.item(i) as { NAME: string; LATITUDE: string; LONGITUDE: string };

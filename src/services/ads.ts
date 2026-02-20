@@ -25,9 +25,7 @@ export type ConsentFlags = {
 };
 
 export const requestConsent = async (): Promise<ConsentFlags> => {
-  await AdsConsent.requestInfoUpdate({
-    debugGeography: __DEV__ ? AdsConsentDebugGeography.EEA : AdsConsentDebugGeography.DISABLED,
-  });
+  await AdsConsent.requestInfoUpdate({});
 
   const info = await AdsConsent.getConsentInfo();
   const needsConsent = info.status === AdsConsentStatus.REQUIRED || info.status === AdsConsentStatus.UNKNOWN;
