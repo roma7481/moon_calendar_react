@@ -15,6 +15,7 @@ type CloseEvent = typeof AdEventType.CLOSED;
 type InterstitialController = {
   load: () => void;
   show: () => Promise<void>;
+  loaded: boolean;
   addAdEventListener: (type: CloseEvent, handler: () => void) => { remove: () => void };
   removeAllListeners: () => void;
 };
@@ -74,12 +75,24 @@ export const initAds = async () => {
 
 export const createInterstitial = (): InterstitialController => {
   if (provider === 'applovin') {
-    return createAppLovinInterstitial();
+    const applovin = createAppLovinInterstitial();
+    return {
+      load: () => applovin.load(),
+      show: () => applovin.show(),
+      get loaded() {
+        return applovin.loaded;
+      },
+      addAdEventListener: (type, handler) => applovin.addAdEventListener(type, handler),
+      removeAllListeners: () => applovin.removeAllListeners(),
+    };
   }
   const interstitial = Admob.createInterstitial();
   return {
     load: () => interstitial.load(),
     show: () => interstitial.show(),
+    get loaded() {
+      return interstitial.loaded;
+    },
     addAdEventListener: (_type, handler) => interstitial.addAdEventListener(Admob.AdEventType.CLOSED, handler),
     removeAllListeners: () => interstitial.removeAllListeners(),
   };

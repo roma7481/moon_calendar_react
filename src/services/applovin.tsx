@@ -96,6 +96,7 @@ export const AppLovinMrec = () => {
 export type AppLovinInterstitial = {
   load: () => void;
   show: () => Promise<void>;
+  loaded: boolean;
   addAdEventListener: (type: 'closed', handler: () => void) => { remove: () => void };
   removeAllListeners: () => void;
 };
@@ -110,12 +111,19 @@ export const createAppLovinInterstitial = (): AppLovinInterstitial => {
     closeHandlers.forEach((handler) => handler());
   };
 
+  let isAdReady = false;
+
   if (AppLovinMAX && typeof AppLovinMAX.addEventListener === 'function') {
+    AppLovinMAX.addEventListener('OnInterstitialLoadedEvent', () => { isAdReady = true; });
+    AppLovinMAX.addEventListener('OnInterstitialLoadFailedEvent', () => { isAdReady = false; });
     AppLovinMAX.addEventListener('OnInterstitialHiddenEvent', hiddenHandler);
     AppLovinMAX.addEventListener('OnInterstitialAdDisplayFailedEvent', displayFailedHandler);
   }
 
   return {
+    get loaded() {
+      return isAdReady;
+    },
     load: () => {
       if (AppLovinMAX && typeof AppLovinMAX.loadInterstitial === 'function') {
         AppLovinMAX.loadInterstitial(INTERSTITIAL_ID);

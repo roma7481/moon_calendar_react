@@ -305,8 +305,8 @@ export const executeSql = async (sql: string, params: (string | number)[] = []):
 
   const run = queryChain.then(task, task);
   queryChain = run.then(
-    () => {},
-    () => {}
+    () => { },
+    () => { }
   );
   return run;
 };

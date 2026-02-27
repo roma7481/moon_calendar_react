@@ -176,8 +176,10 @@ const getAllDaysInMonth = (month: number, year: number) =>
     .map((_, i) => new Date(year, month - 1, i + 1))
     .filter((v) => v.getMonth() === month - 1);
 
-const lunarDays = (date: any, latitude: number, longitude: number, timezone?: string) => {
-  const tzDate = moment.tz(date, 'DD-MM-YYYY', timezone as any);
+const lunarDays = (date: any, latitude: number, longitude: number, timezone: string) => {
+  const tzDate = typeof date === 'string'
+    ? moment.tz(date, 'DD-MM-YYYY', timezone)
+    : moment.tz(date, timezone);
   const res = getLunarDaysInternal(tzDate, latitude, longitude);
   const resPrev = getPrevlunarDaysInternal(tzDate, latitude, longitude);
   return getFormattedDays(getMissingDays(res, resPrev, tzDate));
@@ -194,7 +196,7 @@ const allLunarDaysInMonth = (
   const lunarDates: LunarDay[][] = [];
 
   for (const date of allMonthDates) {
-    lunarDates.push(lunarDays(moment.tz(date as any, 'DD-MM-YYYY', timezone) as any, latitude, longitude));
+    lunarDates.push(lunarDays(date, latitude, longitude, timezone));
   }
 
   return lunarDates;

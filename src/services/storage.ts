@@ -13,6 +13,7 @@ const KEYS = {
   PREMIUM: 'is_premium',
   THEME: 'APP_THEME',
   CUSTOM_CITIES: 'CUSTOM_CITIES',
+  LEGACY_NOTES_ACCESS: 'LEGACY_NOTES_ACCESS',
 };
 
 export const getStoredCity = async (): Promise<City | null> => {
@@ -154,4 +155,13 @@ export const getStoredCustomCities = async (): Promise<StoredCustomCity[]> => {
 
 export const setStoredCustomCities = async (cities: StoredCustomCity[]) => {
   await AsyncStorage.setItem(KEYS.CUSTOM_CITIES, JSON.stringify(cities));
+};
+
+export const getLegacyNotesAccess = async (): Promise<boolean> => {
+  const value = await AsyncStorage.getItem(KEYS.LEGACY_NOTES_ACCESS);
+  return value === 'true';
+};
+
+export const setLegacyNotesAccess = async (granted: boolean) => {
+  await AsyncStorage.setItem(KEYS.LEGACY_NOTES_ACCESS, String(granted));
 };

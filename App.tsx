@@ -23,6 +23,8 @@ import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from 'react-native-
 import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
 import * as Localization from 'expo-localization';
+import * as Application from 'expo-application';
+import * as Device from 'expo-device';
 import { MaterialIcons } from '@expo/vector-icons';
 import * as suncalc from 'suncalc';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -58,6 +60,8 @@ import {
   setStoredPremium,
   setStoredTextSize,
   setStoredTheme,
+  getLegacyNotesAccess,
+  setLegacyNotesAccess,
 } from './src/services/storage';
 import {
   cancelDailyReminder,
@@ -251,6 +255,7 @@ const getStrings = (locale: AppLocale) => {
     importNotes: t('Import notes', 'Импорт заметок', 'メモをインポート'),
     importSuccess: (count: number) => (isRu ? `Импортировано ${count} записей` : isJa ? `${count}件をインポートしました` : `Imported ${count} notes`),
     importFailed: t('Import failed', 'Не удалось импортировать файл', 'インポートに失敗しました'),
+    timezoneLabel: t('Timezone', 'Часовой пояс', 'タイムゾーン'),
     premium: t('Premium', 'Премиум', 'プレミアム'),
     premiumTitle: t('Premium Access', 'Премиум доступ', 'プレミアムアクセス'),
     premiumSubtitle: t('Unlock all features with a one-time purchase', 'Разблокируйте все функции за один платеж', '一度の支払いで全機能を解除'),
@@ -336,6 +341,8 @@ const getStrings = (locale: AppLocale) => {
       'Waning Gibbous': t('Waning Gibbous', 'Убывающая луна', '欠けていく月'),
       'Waning Crescent': t('Waning Crescent', 'Убывающий серп', '欠けていく三日月'),
     },
+    contactSupport: t('Contact Support', 'Написать в поддержку', 'サポートに連絡'),
+    supportEmailFallback: t('Reach us at: cbeeapps@gmail.com', 'Свяжитесь с нами: cbeeapps@gmail.com', '連絡先: cbeeapps@gmail.com'),
   };
 };
 
@@ -446,6 +453,8 @@ const resolveMoonData = async (
   moonDays: LunarDay[]
 ): Promise<MoonScreenData> => {
   const city = selectedCity ?? fallbackCity;
+  const midDay = moment.tz(date, timezone).set({ hour: 12, minute: 0, second: 0, millisecond: 0 }).toDate();
+  const sunIllum = suncalc.getMoonIllumination(midDay);
   const moonInfo = calcMoonInfo(moonDay);
 
   const zodiac = calcMoonZodiac(moonDays, moonDay.number);
@@ -463,7 +472,7 @@ const resolveMoonData = async (
     cityName: city.name,
     moonDay,
     moonPhase: moonInfo.phaseName,
-    illuminationPct: moonInfo.illuminationPct,
+    illuminationPct: sunIllum.fraction * 100,
     daysToFullMoon: moonInfo.daysToFullMoon,
     moonSign: zodiacInfo?.name ?? zodiac.charAt(0).toUpperCase() + zodiac.slice(1),
     moonSignDescription: zodiacInfo?.info,
@@ -505,6 +514,7 @@ function AppContent() {
   const [calendarData, setCalendarData] = useState<Record<number, CalendarDayData>>({});
   const [calendarLoading, setCalendarLoading] = useState(false);
   const [isPremium, setIsPremium] = useState(false);
+  const [legacyNotesAccess, setLegacyNotesAccessState] = useState(false);
   const [paywallVisible, setPaywallVisible] = useState(false);
   const [onboardingStep, setOnboardingStep] = useState<'language' | 'theme' | 'city' | null>(null);
   const [iapReady, setIapReady] = useState(false);
@@ -556,6 +566,16 @@ function AppContent() {
   }, [locale]);
   const theme = useMemo(() => themes[themeName] as (typeof themes)[ThemeName], [themeName]);
   const showAds = !isPremium;
+  const hasNotesAccess = useMemo(() => isPremium || adProvider === 'applovin' || legacyNotesAccess, [isPremium, adProvider, legacyNotesAccess]);
+
+  // Grant notes access to legacy users who have migrated notes
+  useEffect(() => {
+    if (notesLoading || legacyNotesAccess || isPremium) return;
+    if (notes.length > 0) {
+      setLegacyNotesAccessState(true);
+      setLegacyNotesAccess(true).catch(() => { });
+    }
+  }, [notesLoading, notes.length, legacyNotesAccess, isPremium]);
 
   const textScale = useMemo(() => {
     if (textSize === 'small') return 0.9;
@@ -638,12 +658,13 @@ function AppContent() {
   useEffect(() => {
     let active = true;
     const loadSettings = async () => {
-      const [storedLanguage, storedNotifications, storedTextSize, storedPremium, storedTheme] = await Promise.all([
+      const [storedLanguage, storedNotifications, storedTextSize, storedPremium, storedTheme, storedLegacyNotes] = await Promise.all([
         getStoredLanguage(),
         getStoredNotifications(),
         getStoredTextSize(),
         getStoredPremium(),
         getStoredTheme(),
+        getLegacyNotesAccess(),
       ]);
       if (!active) return;
       if (storedLanguage) setLocale(storedLanguage);
@@ -652,6 +673,7 @@ function AppContent() {
       setNotificationMinutes(storedNotifications.minutes);
       if (storedTextSize) setTextSize(storedTextSize);
       setIsPremium(storedPremium);
+      setLegacyNotesAccessState(storedLegacyNotes);
       if (storedTheme) setThemeName(storedTheme);
     };
 
@@ -722,7 +744,13 @@ function AppContent() {
     if (!showAds) return;
     tabSwitchCount.current += 1;
     if (tabSwitchCount.current % 5 === 0) {
-      interstitialRef.current?.show().catch(() => { });
+      if (interstitialRef.current?.loaded) {
+        try {
+          interstitialRef.current?.show().catch(() => { });
+        } catch (_e) {
+          interstitialRef.current?.load();
+        }
+      }
     }
   }, [activeTab, showAds]);
 
@@ -898,18 +926,12 @@ function AppContent() {
         if (!lunarDays || lunarDays.length === 0) continue;
         const uniqueNumbers = Array.from(new Set(lunarDays.map((day) => day.number))).sort((a, b) => a - b);
         const zodiac = calcMoonZodiac(lunarDays);
-        const midDay = moment
-          .tz(
-            {
-              year: calendarMonth.getFullYear(),
-              month: calendarMonth.getMonth() + 1,
-              day: i + 1,
-              hour: 12,
-              minute: 0,
-              second: 0,
-            },
-            timezone
-          )
+        const midDay = moment.tz(calendarMonth, timezone)
+          .date(i + 1)
+          .hour(12)
+          .minute(0)
+          .second(0)
+          .millisecond(0)
           .toDate();
         const illumination = suncalc.getMoonIllumination(midDay);
         dayMap[i + 1] = {
@@ -1280,6 +1302,30 @@ function AppContent() {
     }
   };
 
+  const handleContactUs = async () => {
+    const subject = `Support: ${strings.appTitle}`;
+    const body = `
+[Write your message above]
+
+--- Debug Info ---
+App: ${Application.nativeApplicationVersion} (${Application.nativeBuildVersion})
+Device: ${Device.brand} ${Device.modelName}
+OS: ${Platform.OS} ${Platform.Version}
+------------------`;
+
+    const url = `mailto:cbeeapps@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    try {
+      const canOpen = await Linking.canOpenURL(url);
+      if (canOpen) {
+        await Linking.openURL(url);
+      } else {
+        Alert.alert(strings.support, strings.supportEmailFallback);
+      }
+    } catch (e) {
+      Alert.alert(strings.support, strings.supportEmailFallback);
+    }
+  };
+
   const handleSelectNote = (note: NoteRecord) => {
     if (note.moonDayId) {
       setNoteTargetDayId(note.moonDayId);
@@ -1340,22 +1386,33 @@ function AppContent() {
     try {
       const connected = await RNIap.initConnection();
       if (!connected) return;
-      if (Platform.OS === 'android') {
-        await RNIap.flushFailedPurchasesCachedAsPendingAndroid();
-      }
-      const products = await RNIap.getProducts({ skus: [PREMIUM_PRODUCT_ID] });
-      const product = products.find((p) => p.productId === PREMIUM_PRODUCT_ID);
-      if (product?.localizedPrice) {
-        setProductPrice(product.localizedPrice);
-      }
+
       setIapReady(true);
-      const available = await RNIap.getAvailablePurchases();
-      const hasPremium = available.some((purchase) => purchase.productId === PREMIUM_PRODUCT_ID);
-      if (hasPremium) {
-        await markPremiumActive();
+
+      // 1. Fetch products independently
+      try {
+        // v14 uses fetchProducts
+        const products = await RNIap.fetchProducts({ skus: [PREMIUM_PRODUCT_ID] });
+        const product: any = products?.find((p: any) => p.productId === PREMIUM_PRODUCT_ID);
+        if (product?.localizedPrice || product?.price) {
+          setProductPrice(product.localizedPrice || product.price);
+        }
+      } catch (err) {
+        console.log('[IAP] Failed to fetch products:', err);
+      }
+
+      // 2. Check for available purchases independently (Restore on startup)
+      try {
+        const available = await RNIap.getAvailablePurchases();
+        const hasPremium = available.some((purchase) => purchase.productId === PREMIUM_PRODUCT_ID);
+        if (hasPremium) {
+          await markPremiumActive();
+        }
+      } catch (err) {
+        console.log('[IAP] Failed to check available purchases:', err);
       }
     } catch (err) {
-      // keep silent, user can still use the app without IAP
+      console.log('[IAP] Failed to init connection:', err);
     }
   };
 
@@ -1678,7 +1735,7 @@ function AppContent() {
                     ) : null}
                   </View>
 
-                  {isPremium ? (
+                  {hasNotesAccess ? (
                     <View style={styles.notesCard}>
                       <View style={styles.notesHeaderRow}>
                         <Text style={styles.notesTitle}>{strings.notesTitle}</Text>
@@ -1811,12 +1868,14 @@ function AppContent() {
                         setActiveTab('home');
                       }}
                     >
-                      <Text style={styles.calendarDay}>{dayNumber}</Text>
-                      <Text style={styles.calendarZodiac}>{zodiacSymbol}</Text>
-                      <View style={styles.calendarMoonRow}>
-                        {renderCalendarMoon(illuminationPct, isWaxingDay)}
-                        <Text style={styles.calendarMoonText}>{lunarLabel}</Text>
+                      <View style={styles.calendarCellHeader}>
+                        <Text style={styles.calendarDay}>{dayNumber}</Text>
+                        <Text style={styles.calendarZodiac}>{zodiacSymbol}</Text>
                       </View>
+                      <View style={styles.calendarMoonCentral}>
+                        {renderCalendarMoon(illuminationPct, isWaxingDay)}
+                      </View>
+                      <Text style={styles.calendarMoonText}>{lunarLabel}</Text>
                     </Pressable>
                   );
                 })}
@@ -1825,7 +1884,7 @@ function AppContent() {
           </View>
         )}
 
-        {activeTab === 'notes' && !isPremium && (
+        {activeTab === 'notes' && !hasNotesAccess && (
           <View style={[styles.premiumGateContainer, showAds && { paddingBottom: 110 + insets.bottom }]}>
             <MaterialIcons name="lock" size={48} color={colors.whiteMuted} />
             <Text style={styles.premiumGateTitle}>{strings.premiumTitle}</Text>
@@ -1836,7 +1895,7 @@ function AppContent() {
           </View>
         )}
 
-        {activeTab === 'notes' && isPremium && (
+        {activeTab === 'notes' && hasNotesAccess && (
           <ScrollView
             contentContainerStyle={[styles.notesContent, showAds && { paddingBottom: 110 + insets.bottom }]}
             showsVerticalScrollIndicator={false}
@@ -2037,7 +2096,7 @@ function AppContent() {
                 </View>
               </Pressable>
               <View style={styles.profileRow}>
-                <Text style={styles.profileRowLabel}>Timezone</Text>
+                <Text style={styles.profileRowLabel}>{strings.timezoneLabel}</Text>
                 <Text style={styles.profileRowText}>{timezone}</Text>
               </View>
             </View>
@@ -2168,9 +2227,9 @@ function AppContent() {
               <Text style={styles.profileSectionTitle}>{strings.support}</Text>
               <Pressable
                 style={styles.profileActionRow}
-                onPress={() => Linking.openURL('mailto:support@mooncalendar.app')}
+                onPress={handleContactUs}
               >
-                <Text style={styles.profileRowLabel}>{strings.feedback}</Text>
+                <Text style={styles.profileRowLabel}>{strings.contactSupport}</Text>
                 <MaterialIcons name="chevron-right" size={18} color={colors.whiteMuted} />
               </Pressable>
             </View>
@@ -2603,7 +2662,7 @@ const createStyles = (scale: number, theme: (typeof themes)[ThemeName]) => {
     },
     calendarCell: {
       width: '13.9%',
-      minHeight: 64,
+      minHeight: 76,
       borderRadius: 14,
       padding: 6,
       backgroundColor: theme.calendarCellBg,
@@ -2614,7 +2673,7 @@ const createStyles = (scale: number, theme: (typeof themes)[ThemeName]) => {
     },
     calendarCellEmpty: {
       width: '13.9%',
-      minHeight: 64,
+      minHeight: 76,
       borderRadius: 14,
       backgroundColor: 'transparent',
       marginBottom: 6,
@@ -2635,12 +2694,16 @@ const createStyles = (scale: number, theme: (typeof themes)[ThemeName]) => {
       color: colors.white,
       fontFamily: 'SpaceGrotesk_500Medium',
       fontSize: fs(12),
-      textAlign: 'center',
     },
-    calendarMoonRow: {
+    calendarCellHeader: {
       flexDirection: 'row',
+      justifyContent: 'space-between',
       alignItems: 'center',
-      gap: 4,
+      marginBottom: 2,
+    },
+    calendarMoonCentral: {
+      alignSelf: 'center',
+      marginVertical: 4,
     },
     calendarMoonIcon: {
       width: 18,
@@ -2668,7 +2731,8 @@ const createStyles = (scale: number, theme: (typeof themes)[ThemeName]) => {
     calendarMoonText: {
       color: colors.whiteMuted,
       fontFamily: 'SpaceGrotesk_500Medium',
-      fontSize: fs(9),
+      fontSize: fs(8),
+      textAlign: 'center',
     },
     profileContent: {
       paddingHorizontal: 24,
